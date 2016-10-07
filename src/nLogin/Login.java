@@ -38,6 +38,9 @@ public class Login extends HttpServlet {
         if(Validate.checkUser(account)){
             Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Validate");
             
+            
+            
+          //Check for PROPER RESULTS .. tO EDITED!!
             response.setContentType("text/html");
             
             out.println("U're Validated");
