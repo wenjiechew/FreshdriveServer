@@ -19,7 +19,6 @@ import nUtillities.Logger;
 public class Login extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -28,9 +27,7 @@ public class Login extends HttpServlet {
 		
 		response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        
-        //TO-DO Parameters Checking
-        
+
         Account account = new Account();
         account.setUsername(request.getParameter("username"));
         account.setPassword(request.getParameter("password"));
@@ -39,21 +36,21 @@ public class Login extends HttpServlet {
             Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Validate");
             
             
+            //Check for PROPER RESULTS .. tO EDITED!!
+            //TO-DO TOKEN RETURN RESULT
             
-          //Check for PROPER RESULTS .. tO EDITED!!
-            response.setContentType("text/html");
-            
-            out.println("U're Validated");
-            
-            //TO-DO SESSION ??  TOKEN ??       
+            response.setContentType("text/html");            
+            out.println("U're Validated");          
+
             
         }
         else {
             Logger.getInstance().PrintInfo("Account : is NOT Validate");
+            
 			
 			response.setContentType("text/html" );
 			
-			out.println("U're NOT Validated");
+			out.println("1");
         }
 	}
 
