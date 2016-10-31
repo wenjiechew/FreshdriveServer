@@ -23,7 +23,7 @@ public class Validate {
 			connection = DBAccess.getInstance().openDB();
 			//Get password for selected user account
 			preparedStatement = connection.prepareStatement("SELECT user_password FROM "
-					+ "users WHERE user_email=?");
+					+ "users WHERE username=?");
 			
 			preparedStatement.setString(1, account.getUsername());
 			ResultSet rs = preparedStatement.executeQuery();
