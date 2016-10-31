@@ -23,7 +23,7 @@ public class Login extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Logger.getInstance().PrintInfo("User Respose POST === " + request.getParameter("username") + " AND " + request.getParameter("password"));
+		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("username") + " AND " + request.getParameter("password"));
 		
 		response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
@@ -35,19 +35,16 @@ public class Login extends HttpServlet {
         if(Validate.checkUser(account)){
             Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Validate");
             
-            
             //Check for PROPER RESULTS .. tO EDITED!!
-            //TO-DO TOKEN RETURN RESULT
+            //TODO Return session/login token
             
             response.setContentType("text/html");            
-            out.println("U're Validated");          
-
+            out.println("Validated");          
             
         }
         else {
             Logger.getInstance().PrintInfo("Account : is NOT Validate");
-            
-			
+            //TODO Keep track of number of times user has failed login
 			response.setContentType("text/html" );
 			
 			out.println("1");

@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import nDatabase.DBAccess;
 import nObjectModel.Account;
 import nUtillities.Logger;
@@ -14,24 +16,26 @@ public class Validate {
 	private static PreparedStatement preparedStatement;
 
 	public static boolean checkUser(Account account) {
-		Logger.getInstance().PrintInfo("CheckUser()", "Checking User " + account.getUsername() + " " + account.getPassword());
-		
+        String password = account.getPassword();
+		Logger.getInstance().PrintInfo("CheckUser()", "Checking User " + account.getUsername() + " PW: " + password);
 		boolean valid = false;
 		try {
 			connection = DBAccess.getInstance().openDB();
-			preparedStatement = connection.prepareStatement("SELECT * FROM "
-					+ "UserAccount WHERE username=? and password=?");
+			//Get password for selected user account
+			preparedStatement = connection.prepareStatement("SELECT user_password FROM "
+					+ "users WHERE user_email=?");
 			
 			preparedStatement.setString(1, account.getUsername());
-			preparedStatement.setNString(2, account.getPassword());
 			ResultSet rs = preparedStatement.executeQuery();
 			
 			if(rs.next()){
-				
-				return valid = true;
+				//Retrieve hashed password in database
+				String hashed = rs.getString("user_password");
+				//Compare and validate given password input
+				if (BCrypt.checkpw(password, hashed))
+					return valid = true;
 			}
 			DBAccess.getInstance().closeDB();
-			
 			
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("openDB() ", e.toString());

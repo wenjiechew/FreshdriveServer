@@ -5,7 +5,7 @@ public class Constants {
 	// ------------------------------ DATABASE CONSTANT DATA ------------------------------ //
 	// JDBC driver name and database URL
 	public final static String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	public final static String DB_URL = "jdbc:mysql://localhost:3306/freshdrive";
+	public final static String DB_URL = "jdbc:mysql://localhost:3306/freshdrivedb";
 	
 	//Database Connection
 	public final static String USER = "root";
