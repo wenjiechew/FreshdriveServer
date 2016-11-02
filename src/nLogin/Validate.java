@@ -21,9 +21,9 @@ public class Validate {
 		boolean valid = false;
 		try {
 			connection = DBAccess.getInstance().openDB();
-			//Get password for selected user account
+			//Get password for selected user account based on given username
 			preparedStatement = connection.prepareStatement("SELECT user_password FROM "
-					+ "users WHERE user_email=?");
+					+ "users WHERE username=?");
 			
 			preparedStatement.setString(1, account.getUsername());
 			ResultSet rs = preparedStatement.executeQuery();
