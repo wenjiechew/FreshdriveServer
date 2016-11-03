@@ -2,6 +2,8 @@ package nLogin;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,16 +33,19 @@ public class Login extends HttpServlet {
         Account account = new Account();
         account.setUsername(request.getParameter("username"));
         account.setPassword(request.getParameter("password"));
-
         if(Validate.checkUser(account)){
             Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Validate");
-            
-            //Check for PROPER RESULTS .. tO EDITED!!
-            //TODO Return session/login token
-            
-            response.setContentType("text/html");            
-            out.println("Validated");          
-            
+            //Generate token
+            account.setToken(genToken());
+            response.setContentType("text/html");   
+            //Insert into database
+            if(Validate.insertToken(account)==0){
+            	//If no records were updated (i.e. 0 rows updated)
+            	//Active token existing; someone is currently logged in with the account
+                out.println("active-token");
+            }
+            else         
+            	out.println(account.getToken()); //Return access token as results          
         }
         else {
             Logger.getInstance().PrintInfo("Account : is NOT Validate");
@@ -50,5 +55,11 @@ public class Login extends HttpServlet {
 			out.println("1");
         }
 	}
+	
+	public String genToken(){
+		SecureRandom random = new SecureRandom();
+		return new BigInteger(130, random).toString(32);
+	}
+	
 
 }

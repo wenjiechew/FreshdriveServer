@@ -45,5 +45,41 @@ public class Validate {
 		
 		return valid;
 	}
-
+	
+	public static int insertToken(Account account){
+		int rs = 0;
+		try {
+			connection = DBAccess.getInstance().openDB();
+			//Update database with generated token value
+			preparedStatement = connection.prepareStatement("UPDATE users SET user_token=? "
+					+ "WHERE user_token is null AND username=?");
+			preparedStatement.setString(1, account.getToken());
+			preparedStatement.setString(2, account.getUsername());
+			rs = preparedStatement.executeUpdate();
+			DBAccess.getInstance().closeDB();
+		} catch (SQLException e) {
+			Logger.getInstance().PrintError("openDB() ", e.toString());
+		} catch (Exception e) {
+			Logger.getInstance().PrintError("openDB() ", e.toString());
+		}		
+		return rs;
+	}
+	
+	public static int clearTokenOnLogout(String username){
+		int done = 0;
+		try{
+			connection = DBAccess.getInstance().openDB();
+			//Update database with generated token value
+			preparedStatement = connection.prepareStatement("UPDATE users SET user_token=NULL "
+					+ "WHERE username=?");
+			preparedStatement.setString(1, username);
+			done = preparedStatement.executeUpdate();
+			DBAccess.getInstance().closeDB();
+		} catch (SQLException e) {
+			Logger.getInstance().PrintError("openDB() ", e.toString());
+		} catch (Exception e) {
+			Logger.getInstance().PrintError("openDB() ", e.toString());
+		}
+		return done;
+	}
 }
