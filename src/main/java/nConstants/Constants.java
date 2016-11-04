@@ -1,7 +1,5 @@
 package nConstants;
 
-import java.util.Date;
-
 public class Constants {	
 	
 	// ------------------------------ DATABASE CONSTANT DATA ------------------------------ //
@@ -13,10 +11,7 @@ public class Constants {
 	public final static String USER = "root";
 	public final static String PASS = "";
 	
-//	//Scheduled Time Rate
-//	private final static Date midnight = new D
-//	
-//	
-//	public final static long 
+	//File DataBaseRows
+	public final static String DELETE_FILEIDS = "DELETE FROM files WHERE file_ID IN ( SELECT * FROM ( SELECT file_ID FROM files WHERE file_expireOn < current_date() ) AS f );";
 
 }

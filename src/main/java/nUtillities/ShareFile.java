@@ -40,29 +40,30 @@ public class ShareFile extends HttpServlet {
         List<String> errorUserList = new ArrayList<String>();
         List<Integer> userIDs = new ArrayList<Integer>();
         
-        for (int i = 0; i < userArray.length; i++){
-        	int userValidity = validateUser(userArray[i]);
-        	
-            if (userValidity != 0) {
-            	System.out.println(userArray[i] + " is validated.");
-            	userIDs.add(userValidity);
-            }
-            else
-            {
-            	System.out.println(userArray[i] + " is not validated.");
-            	errorUserList.add(userArray[i]);
-            }
-        }
-        
         if (validateFile(fileID)){
+        	
+        	for (int i = 0; i < userArray.length; i++){
+            	int userValidity = validateUser(userArray[i]);
+            	
+                if (userValidity != 0) {
+                	System.out.println(userArray[i] + " is validated.");
+                	userIDs.add(userValidity);
+                }
+                else
+                {
+                	System.out.println(userArray[i] + " is not validated.");
+                	errorUserList.add(userArray[i]);
+                }
+            }
+        	
         	shareFile(userIDs, Integer.parseInt(fileID));
         	if (errorUserList.size() != 0){
             	out.print(errorUserList);
         	}
-        	else
-        	{
-        		
-        	}
+        }
+        else
+        {
+        	out.print("File");
         }
 	}
 	
