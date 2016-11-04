@@ -31,4 +31,5 @@ dependencies {
     compile 'org.mindrot:jbcrypt:0.3m'
     compile 'javax.servlet:javax.servlet-api:4.0.0-b01'
     compile 'mysql:mysql-connector-java:5.1.39'
+    compile 'javax.mail:javax.mail-api:1.4.5'
 }
