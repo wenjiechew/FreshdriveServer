@@ -2,13 +2,10 @@ package nFileHandler;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.Enumeration;
 import java.util.Locale;
-import java.nio.file.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -17,16 +14,37 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-//import org.apache.tomcat.util.http.fileupload.IOUtils;
-
 import com.dropbox.core.*;
 
+/**
+ * Servlet implementation class Upload
+ */
 @WebServlet("/Upload")
-public class Upload extends HttpServlet{
+public class Upload extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	static final int BUFFER_SIZE = 524288000;
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+//       
+//    /**
+//     * @see HttpServlet#HttpServlet()
+//     */
+//    public Upload() {
+//        super();
+//        // TODO Auto-generated constructor stub
+//    }
+//
+//	/**
+//	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+//	 */
+//	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//		// TODO Auto-generated method stub
+//		response.getWriter().append("Served at: ").append(request.getContextPath());
+//	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
 		System.out.println("Upload Servlet Begin");
 		response.setContentType("text/html;");
 		PrintWriter out = response.getWriter();
@@ -79,6 +97,7 @@ public class Upload extends HttpServlet{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		
+	
 	}
+
 }
