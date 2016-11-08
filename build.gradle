@@ -32,4 +32,6 @@ dependencies {
     compile 'javax.servlet:javax.servlet-api:4.0.0-b01'
     compile 'mysql:mysql-connector-java:5.1.39'
     compile 'javax.mail:javax.mail-api:1.4.5'
+    compile 'com.dropbox.core:dropbox-core-sdk:1.8.2'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.6.1'
 }
