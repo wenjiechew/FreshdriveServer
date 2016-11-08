@@ -67,7 +67,7 @@ public class Upload extends HttpServlet {
 		String filePath = request.getHeader("filePath");
 		//get the filelength from the client side also
 		Long fileLength = Long.parseLong(request.getHeader("fileLength"));
-		
+		String username = request.getHeader("username");
 		
 		File inputFile = new File(filePath);
 		System.out.println("File Path: " + filePath);
@@ -89,12 +89,15 @@ public class Upload extends HttpServlet {
 //		System.out.println(inputStream.available());
 		try {
 			//writing the file into the dropbox
-			DbxEntry.File uploadedFile = client.uploadFile("/" + inputFile.getName(), DbxWriteMode.add(),
+			DbxEntry.File uploadedFile = client.uploadFile("/" + username + "/" + inputFile.getName(), DbxWriteMode.add(),
 					fileLength, fileInputStream);
 			System.out.println("Uploaded: " + uploadedFile.toString());
+			response.setContentType("text/html");
+			out.println("File Uploaded");
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			out.println("File Failed");
 			e.printStackTrace();
 		} 
 	
