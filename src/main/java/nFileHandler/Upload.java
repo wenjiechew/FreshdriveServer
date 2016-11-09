@@ -23,22 +23,7 @@ import com.dropbox.core.*;
 public class Upload extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	static final int BUFFER_SIZE = 524288000;
-//       
-//    /**
-//     * @see HttpServlet#HttpServlet()
-//     */
-//    public Upload() {
-//        super();
-//        // TODO Auto-generated constructor stub
-//    }
-//
-//	/**
-//	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-//	 */
-//	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//		// TODO Auto-generated method stub
-//		response.getWriter().append("Served at: ").append(request.getContextPath());
-//	}
+
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
@@ -49,11 +34,7 @@ public class Upload extends HttpServlet {
 		response.setContentType("text/html;");
 		PrintWriter out = response.getWriter();
 //		
-		//APP KEY AND SECRET FROM DROPBOX
-		String APP_KEY = "hlxjjkypee9pfx6";
-		String APP_SECRET = "a9akptnjcley8jk";
 
-		DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
 		DbxRequestConfig config = new DbxRequestConfig("FreshDrive", Locale.getDefault().toString());
 //
 //		// access token for the dropbox account. may need to encrypt this
@@ -62,6 +43,7 @@ public class Upload extends HttpServlet {
 		System.out.println("Connect to dropbox");
 		DbxClient client;
 		client = new DbxClient(config, accessToken);
+		
 //
 //		get the file path from the property sent from the client side
 		String filePath = request.getHeader("filePath");
@@ -74,16 +56,10 @@ public class Upload extends HttpServlet {
 		
 		//get the input from the client's output stream
         ServletInputStream fileInputStream = request.getInputStream();
-		InputStream inputStream = request.getInputStream();
-		
-		
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int bytesRead = -1;
-        
+//	
+//        
         System.out.println("Receiving data...");
         
-        FileInputStream inputS = new FileInputStream(inputFile);
-        System.out.println("inputS available: " + inputS.available());
 		//Try uploading to dropbox
 		System.out.println("Try uploading");
 //		System.out.println(inputStream.available());
@@ -94,6 +70,7 @@ public class Upload extends HttpServlet {
 			System.out.println("Uploaded: " + uploadedFile.toString());
 			response.setContentType("text/html");
 			out.println("File Uploaded");
+//			client.delete("/test (2).txt");
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
