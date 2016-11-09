@@ -133,7 +133,7 @@ public class Login extends HttpServlet {
 		generateMailMessage = new MimeMessage(getMailSession);
 		generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
 		generateMailMessage.setSubject("Freshdrive Log in validation");
-		String emailBody = "Please enter the following code for validating your login: " + randomSixDigitCode()
+		String emailBody = "Dear User, <br><br> Please enter the following code for validating your login: " + randomSixDigitCode()
 				+ "<br><br> Regards, <br>Freshdrive Admin";
 		generateMailMessage.setContent(emailBody, "text/html");
 		System.out.println("Mail Session has been created successfully..");
@@ -148,7 +148,7 @@ public class Login extends HttpServlet {
 		// https://www.google.com/settings/security/lesssecureapps
 		// ideally creating a gmail account specfic for freshdrive would be
 		// better
-		transport.connect("smtp.gmail.com", "<<GMAIL-ADDRESS>>", "<<PASSWORD>>");
+		transport.connect("smtp.gmail.com", "freshdrive3103@gmail.com", "Qwerty1@3$");
 		transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
 		transport.close();
 	}
