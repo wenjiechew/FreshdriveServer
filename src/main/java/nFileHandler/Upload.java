@@ -94,6 +94,8 @@ public class Upload extends HttpServlet {
 					System.out.println("Uploaded: " + uploadedFile.toString());
 					response.setContentType("text/html");
 					out.println("File Uploaded");
+					//TODO if fail, rollback (i.e. delete) created file record inside database 
+					
 					// client.delete("/test (2).txt");
 
 					}
