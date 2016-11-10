@@ -133,7 +133,7 @@ public class Upload extends HttpServlet {
 			rset = preparedStatement.executeQuery();
 			if (rset.next()) {
 				count = rset.getInt(1);
-				System.out.println("COUNTER: "+count);
+//				System.out.println("COUNTER: "+count);
 			}
 		} finally {
 			if (rset != null) {
@@ -152,7 +152,7 @@ public class Upload extends HttpServlet {
 			}
 
 		}
-		System.out.println("COUNTER: "+count);
+//		System.out.println("COUNTER: "+count);
 		return (count == 0);
 	}
 
