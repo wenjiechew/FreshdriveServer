@@ -65,7 +65,7 @@ public class Upload extends HttpServlet {
 		// get the filelength from the client side also
 		Long fileLength = Long.parseLong(request.getHeader("fileLength"));
 		String username = request.getHeader("username");
-		// String ownerId = request.getHeader("ownerID");
+		 String ownerId = request.getHeader("ownerID");
 		String createdOn = request.getHeader("createdOn");
 		String expireDate = request.getHeader("expiryDate");
 		String fileName = request.getHeader("fileName");
@@ -73,7 +73,7 @@ public class Upload extends HttpServlet {
 		System.out.println("File Path: " + filePath);
 		boolean fileExist;
 		try {
-			fileExist = checkIfFileExist(fileName,"1"); //INSERT OWNER ID
+			fileExist = checkIfFileExist(fileName, ownerId); //INSERT OWNER ID
 			if (fileExist) {
 				// get the input from the client's output stream
 				ServletInputStream fileInputStream = request.getInputStream();
@@ -85,7 +85,7 @@ public class Upload extends HttpServlet {
 				System.out.println("Try uploading");
 				// System.out.println(inputStream.available());
 				try {
-					boolean dbSuccess = addFileToDb(fileName, filePath, fileLength, createdOn, "1", expireDate);	//INSERT OWNER ID
+					boolean dbSuccess = addFileToDb(fileName, filePath, fileLength, createdOn, ownerId, expireDate);	//INSERT OWNER ID
 					//if successfully added to database then upload file to dropbox
 					if(dbSuccess){
 					// writing the file into the dropbox

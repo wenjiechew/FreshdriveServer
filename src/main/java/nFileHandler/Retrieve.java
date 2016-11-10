@@ -61,7 +61,7 @@ public class Retrieve extends HttpServlet {
 			connection = DBAccess.getInstance().openDB();
 			// Get password for selected user account based on given username
 			preparedStatement = connection.prepareStatement("SELECT file_name from files WHERE file_ownerID = ?");
-			preparedStatement.setString(1, "1"); // TODO CHANGE OWNERID
+			preparedStatement.setString(1, userID); 
 			rset = preparedStatement.executeQuery();
 			while (rset.next()) {
 				array.add(rset.getString(1));
