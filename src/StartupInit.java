@@ -38,7 +38,7 @@ public class StartupInit implements ServletContextListener {
 		
 		executorService.scheduleAtFixedRate(() -> {
 			
-			//System.out.println("Hi there at: " + new java.util.Date());
+			System.out.println("Hi there at: " + new java.util.Date());
 			
 			
 		}, 0, 1000L, TimeUnit.MILLISECONDS);

@@ -151,7 +151,7 @@ public class Login extends HttpServlet {
 		
 		//Make OTP expire after a specific time limit
 		executorService = Executors.newScheduledThreadPool(1);
-		executorService.schedule(()->{expireOTP(account.getUsername());}, 31L, TimeUnit.SECONDS);
+		executorService.schedule(()->{expireOTP(account.getUsername());}, 180L, TimeUnit.SECONDS);
 	}
 
 	private void expireOTP(String username) {
