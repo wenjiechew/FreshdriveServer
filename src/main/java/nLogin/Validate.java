@@ -36,7 +36,6 @@ public class Validate {
 					return valid = true;
 			}
 			DBAccess.getInstance().closeDB();
-			
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("openDB() ", e.toString());
 		} catch (Exception e) {
@@ -46,15 +45,34 @@ public class Validate {
 		return valid;
 	}
 	
-	public static int insertToken(Account account){
+	public static int isLoggedIn(Account account){
+		int rs = 0;
+		try{
+			connection = DBAccess.getInstance().openDB();
+			preparedStatement = connection.prepareStatement("SELECT COUNT(*) FROM "
+					+ "users WHERE username=? and user_token is null");
+			preparedStatement.setString(1, account.getUsername());
+			ResultSet results = preparedStatement.executeQuery();
+			if(results.next())
+				rs = results.getInt("COUNT(*)");
+			DBAccess.getInstance().closeDB();
+		} catch (SQLException e) {
+			Logger.getInstance().PrintError("openDB() ", e.toString());
+		} catch (Exception e) {
+			Logger.getInstance().PrintError("openDB() ", e.toString());
+		}		
+		return rs;
+	}
+	
+	public static int insertToken(String username, String token){
 		int rs = 0;
 		try {
 			connection = DBAccess.getInstance().openDB();
 			//Update database with generated token value
 			preparedStatement = connection.prepareStatement("UPDATE users SET user_token=? "
 					+ "WHERE user_token is null AND username=?");
-			preparedStatement.setString(1, account.getToken());
-			preparedStatement.setString(2, account.getUsername());
+			preparedStatement.setString(1, token);
+			preparedStatement.setString(2, username);
 			rs = preparedStatement.executeUpdate();
 			DBAccess.getInstance().closeDB();
 		} catch (SQLException e) {
@@ -81,5 +99,30 @@ public class Validate {
 			Logger.getInstance().PrintError("openDB() ", e.toString());
 		}
 		return done;
+	}
+	
+	//Validate 2FA OTP
+	public static int verifyOTP(String un, String code){
+		String dbOTP = null;
+		try{
+			connection = DBAccess.getInstance().openDB();
+			//Get password for selected user account based on given username
+			preparedStatement = connection.prepareStatement("SELECT user_OTP FROM "
+					+ "users WHERE username=?");
+			preparedStatement.setString(1, un);
+			ResultSet rs = preparedStatement.executeQuery();
+			if(rs.next())
+				dbOTP = rs.getString("user_OTP");
+			if(dbOTP==null)
+				return -1;
+			if(dbOTP.equals(code))
+				return 1;
+			DBAccess.getInstance().closeDB();
+		} catch (SQLException e) {
+			Logger.getInstance().PrintError("openDB() ", e.toString());
+		} catch (Exception e) {
+			Logger.getInstance().PrintError("openDB() ", e.toString());
+		}
+		return 0;
 	}
 }
