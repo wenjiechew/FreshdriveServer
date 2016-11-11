@@ -9,6 +9,7 @@
 
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
+apply plugin: 'eclipse-wtp'
 
 // In this section you declare where to find the dependencies of your project
 repositories {
@@ -35,5 +36,6 @@ dependencies {
     compile 'com.dropbox.core:dropbox-core-sdk:1.8.2'
     compile 'com.fasterxml.jackson.core:jackson-core:2.6.1'
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
-    
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'io.github.endreman0:java-json:0.13.0'
 }

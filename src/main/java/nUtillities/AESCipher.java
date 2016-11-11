@@ -49,7 +49,7 @@ public class AESCipher {
 	 This updates the restricted policies to unlimited policies to allow for a larger key size.
 	 
 	 "InvalidKeyException: Illegal Key Size" error may occur if not done.*/
-	public static void EncryptString (String filePath){
+	public static String[] EncryptString (String filePath){
 		try {
 			/*Generate a 8 byte SecureRandom salt*/
 			byte[] salt = generateSalt();
@@ -63,15 +63,17 @@ public class AESCipher {
 			System.out.println("[Information] IV: " + iv.toString());
 			System.out.println("[Information] Cipher: " + ciphertext.toString());
 			//TODO: Return salt, IV and encrypted string to save in database
-			DecryptString(ciphertext, iv, salt); //Testing purposes only
+			String[] fileInfo = {ciphertext.toString(), iv.toString(), salt.toString()};
+			return fileInfo;
 		}
 		catch (Exception ex)
 		{
 			System.err.println("[Error] EncryptString(): " + ex);
 		}
+		return null;
 	}
 	
-	public static void DecryptString (byte[] ciphertext, byte[] iv, byte[] salt){
+	public static String DecryptString (byte[] ciphertext, byte[] iv, byte[] salt){
 		try {
 			/* Decrypt the message, given derived key and initialization vector. */
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -79,10 +81,12 @@ public class AESCipher {
 			String plaintext = new String(cipher.doFinal(ciphertext), "UTF-8");
 			System.out.println("[Information] Decryption has been performed.");
 			System.out.println("[Information] " + plaintext);
+			return plaintext;
 		}
 		catch (Exception ex)
 		{
 			System.err.println("[Error] DecryptString(): " + ex);
 		}
+		return null;
 	}
 }

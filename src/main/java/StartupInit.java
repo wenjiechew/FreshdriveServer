@@ -28,8 +28,7 @@ public class StartupInit implements ServletContextListener {
     	midnight.setHours(24);
     	midnight.setMinutes(0);
     	midnight.setSeconds(0);
-    	System.out.println("HOLLA");
-
+    	
     	initialDelay = new Date( midnight.getTime() - System.currentTimeMillis() ).getTime();
     	
     	
