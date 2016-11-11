@@ -3,8 +3,6 @@ package nLogin;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import java.math.BigInteger;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,7 +26,6 @@ import nConstants.EmailSettings;
 import java.security.KeyManagementException;
 import java.security.SecureRandom;
 
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -95,7 +92,6 @@ public class Login extends HttpServlet {
 		}
 	}
 
-	}
 
 	public String getEmail(String userName) throws IOException, KeyManagementException, MessagingException {
 		String email = "";

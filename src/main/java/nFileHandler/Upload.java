@@ -16,12 +16,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.JOptionPane;
 
 import com.dropbox.core.*;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import nDatabase.DBAccess;
 import nUtillities.AESCipher;
 import nUtillities.Logger;

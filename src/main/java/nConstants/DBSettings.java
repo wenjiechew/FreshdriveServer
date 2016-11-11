@@ -63,11 +63,7 @@ public class DBSettings {
             setDB_URL(  (String) jsonObject.get("DB_URL"));
             setDB_USER( (String) jsonObject.get("DB_USER"));
             setDB_PASS( (String) jsonObject.get("DB_PASS") );
-            
-            System.out.println(Constants.getCurrentPath());
-
-           
- 
+             
         } catch (Exception e) {
             e.printStackTrace();
         }
