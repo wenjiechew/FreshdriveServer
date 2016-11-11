@@ -46,16 +46,13 @@ public class SharingList extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("ownerID") + " AND " + request.getParameter("filename"));
+		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("fileID"));
 		
-		String fileName = request.getParameter("filename");
-		int ownerID = Integer.parseInt(request.getParameter("ownerID"));
+		int fileID = Integer.parseInt(request.getParameter("fileID"));
 		
 		response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        System.out.println("doPost(): " + request.getParameter("ownerID") + ", " + request.getParameter("filename"));
-        
-        int fileID = ShareFile.getFileID(ownerID, fileName);
+        System.out.println("doPost(): " + request.getParameter("fileID"));
         
         if (fileID != 0){
     		List<Integer> sharedUsers = new ArrayList<Integer>();

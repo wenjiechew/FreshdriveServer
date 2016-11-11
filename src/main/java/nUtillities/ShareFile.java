@@ -27,10 +27,9 @@ public class ShareFile extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("users")+ ", " + request.getParameter("ownerID") + " AND " + request.getParameter("filename"));
+		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("users")+ ", " + request.getParameter("fileID"));
 		
-		String fileName = request.getParameter("filename");
-		int ownerID = Integer.parseInt(request.getParameter("ownerID"));
+		int fileID = Integer.parseInt(request.getParameter("fileID"));
 		
 		response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
@@ -40,8 +39,6 @@ public class ShareFile extends HttpServlet {
         String[] userArray = userString.split(", ");
         List<String> errorUserList = new ArrayList<String>();
         List<Integer> userIDs = new ArrayList<Integer>();
-        
-        int fileID = getFileID(ownerID, fileName);
         
         if (fileID != 0){
 	        if (validateFile(fileID)){
@@ -59,7 +56,6 @@ public class ShareFile extends HttpServlet {
 	                	errorUserList.add(userArray[i]);
 	                }
 	            }
-	        	
 	        	shareFile(userIDs, fileID);
 	        	if (errorUserList.size() != 0){
 	            	out.print(errorUserList);
@@ -74,38 +70,6 @@ public class ShareFile extends HttpServlet {
         {
         	out.print("File");
         }
-	}
-	
-	public static int getFileID(int ownerID, String fileName){
-		int fileID = 0;
-		
-		try {
-			connection = DBAccess.getInstance().openDB();
-			preparedStatement = connection.prepareStatement("SELECT file_ID FROM "
-					+ "files WHERE file_ownerID=? AND file_name=?");
-			
-			preparedStatement.setInt(1, ownerID);
-			preparedStatement.setString(2, fileName);
-			ResultSet rs = preparedStatement.executeQuery();
-			
-			if(rs.next()){
-				fileID = rs.getInt("file_ID");
-				System.out.println("getFileID(): " + fileName + " is retrieved with fileID, " + fileID);
-				Logger.getInstance().PrintInfo("getFileID(): " + fileName + " is retrieved with fileID, " + fileID);
-			}
-			else
-			{
-				System.out.println("getFileID(): " + fileName + " not found.");
-				Logger.getInstance().PrintInfo("getFileID(): " + fileName + " not found.");
-				fileID = 0;
-			}
-			
-			DBAccess.getInstance().closeDB();
-		} catch (Exception e) {
-			System.out.println("getFileID(): " + e.toString());
-			Logger.getInstance().PrintError("getFileID() ", e.toString());
-		}
-		return fileID;
 	}
 	
 	public static int shareFile(List<Integer> users, int fileID){
