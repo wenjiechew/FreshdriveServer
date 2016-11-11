@@ -69,7 +69,7 @@ public class Upload extends HttpServlet {
 		System.out.println("File Path: " + filePath);
 		boolean fileExist;
 		try {
-			fileExist = checkIfFileExist(fileName, ownerId); //INSERT OWNER ID
+			fileExist = checkIfFileExist(fileName, ownerId); 
 			if (fileExist) {
 				// get the input from the client's output stream
 				ServletInputStream fileInputStream = request.getInputStream();
@@ -101,6 +101,8 @@ public class Upload extends HttpServlet {
 					out.println("File Failed");
 					e.printStackTrace();
 				}
+				response.setContentType("text/html");
+				out.println("File uploaded");
 			}else{
 				response.setContentType("text/html");
 				out.println("File already exist");
@@ -116,7 +118,7 @@ public class Upload extends HttpServlet {
 
 	private boolean checkIfFileExist(String fileName, String owner_id) throws Exception {
 		// TODO Auto-generated method stub
-		// true: yes, false: no
+		// true: don't exist, false: exist
 		int count = 0;
 		ResultSet rset = null;
 		try {
@@ -192,15 +194,15 @@ public class Upload extends HttpServlet {
 		connection = DBAccess.getInstance().openDB();
 		// Get password for selected user account based on given username
 		preparedStatement = connection.prepareStatement("INSERT INTO permissions (permission_fileID, permission_sharedToUserID)"
-														+ "VALUES((SELECT file_ID FROM files WHERE file_name = '"+fileName+"'), '"+ownerId+"' )");
+														+ "VALUES((SELECT file_ID FROM files WHERE file_name = '"+fileName+"' AND file_ownerID = '"+ownerId+"'), '"+ownerId+"' )");
 		preparedStatement.executeUpdate();
 		DBAccess.getInstance().closeDB();
 		
 															
 		}catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
+			Logger.getInstance().PrintError("Insert into permission sql error", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
+			Logger.getInstance().PrintError("Insert into permission exception error", e.toString());
 		}
 	}
 
