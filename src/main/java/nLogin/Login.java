@@ -3,8 +3,6 @@ package nLogin;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import java.math.BigInteger;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,10 +21,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import nConstants.EmailSettings;
+
 import java.security.KeyManagementException;
 import java.security.SecureRandom;
 
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +40,8 @@ import nUtillities.Logger;
  */
 @WebServlet("/Login")
 public class Login extends HttpServlet {
+	private EmailSettings emailSettings = new EmailSettings();
+	
 	private static final long serialVersionUID = 1L;
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
@@ -90,6 +91,7 @@ public class Login extends HttpServlet {
 			out.println("1");
 		}
 	}
+
 
 	public String getEmail(String userName) throws IOException, KeyManagementException, MessagingException {
 		String email = "";
@@ -145,8 +147,7 @@ public class Login extends HttpServlet {
 		System.out.println("\n\n 3rd ===> Get Session and Send mail");
 		Transport transport = getMailSession.getTransport("smtp");
 
-		// TODO: Store email credentials somewhere safe?
-		transport.connect("smtp.gmail.com", "freshdrive3103@gmail.com", "Qwerty1@3$");
+		transport.connect("smtp.gmail.com", emailSettings.getEmailAddress() , emailSettings.getEmailPass());
 		transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
 		transport.close();
 

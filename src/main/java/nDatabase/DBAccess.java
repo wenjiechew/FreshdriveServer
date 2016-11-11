@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import nConstants.Constants;
+import nConstants.DBSettings;
 import nUtillities.Logger;
 
 /**
@@ -12,9 +14,11 @@ import nUtillities.Logger;
  */
 public class DBAccess {
 	private static DBAccess instance;
+	private DBSettings setting = new DBSettings();
+
 	
 	public static DBAccess getInstance() { 
-		if( instance == null ) { instance = new DBAccess(); }
+		if( instance == null ) { instance = new DBAccess(); }	
 		return instance;
 	}	
 	
@@ -22,12 +26,12 @@ public class DBAccess {
 	
 	public Connection openDB() throws SQLException, Exception{
 		Logger.getInstance().PrintInfo("OpenDB ()", "Connecting to database..." );
-
+		
 		//Register JDBC
-		Class.forName(nConstants.Constants.JDBC_DRIVER);
+		Class.forName(Constants.getJDBC_DRIVER());
 		
 		//Opening Connection		
-		connection = DriverManager.getConnection(nConstants.Constants.DB_URL, nConstants.Constants.USER, nConstants.Constants.PASS);
+		connection = DriverManager.getConnection( setting.getDB_URL() , setting.getDB_USER(), setting.getDB_PASS());
 		Logger.getInstance().PrintInfo("Database Successful Connection");
 		return connection;			
 	}
@@ -39,5 +43,14 @@ public class DBAccess {
 		
 		Logger.getInstance().PrintInfo("Database is Closed");
 	}
+	
+	
 
+	
+	
+	
+
+	
+	
+	
 }

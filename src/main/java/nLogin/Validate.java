@@ -35,6 +35,7 @@ public class Validate {
 					return valid = true;
 			}
 			DBAccess.getInstance().closeDB();
+			
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("openDB() ", e.toString());
 		} catch (Exception e) {

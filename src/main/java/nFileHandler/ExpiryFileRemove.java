@@ -10,10 +10,13 @@ import com.dropbox.core.DbxClient;
 import com.dropbox.core.DbxRequestConfig;
 
 import nConstants.Constants;
+import nConstants.DropboxSettings;
 import nDatabase.DBAccess;
 import nUtillities.Logger;
 
 public class ExpiryFileRemove {
+	private static DropboxSettings dropboxSettings = new DropboxSettings();
+	
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
 	private static PreparedStatement findFileStatement;
@@ -24,7 +27,7 @@ public class ExpiryFileRemove {
 				connection = DBAccess.getInstance().openDB();
 				
 				//Get All file_id of the Files that is before current dates
-				preparedStatement = connection.prepareStatement(Constants.DELETE_FILEIDS);
+				preparedStatement = connection.prepareStatement( Constants.getDELETE_FILEIDS() );
 				String findFileQuery = "SELECT file_name FROM files WHERE file_expireOn < current_date()";
 				findFileStatement = connection.prepareStatement(findFileQuery);
 				ResultSet rset = findFileStatement.executeQuery();
@@ -38,13 +41,13 @@ public class ExpiryFileRemove {
 				DbxRequestConfig config = new DbxRequestConfig("FreshDrive", Locale.getDefault().toString());
 				//
 				// // access token for the dropbox account. may need to encrypt this
-				String accessToken = "-TcOHePlr9AAAAAAAAAACMWGsYvDXPTDcThy6nM8r0hwG-Mz5cEqtDxcDygkg9i3";
+//				String accessToken = "-TcOHePlr9AAAAAAAAAACMWGsYvDXPTDcThy6nM8r0hwG-Mz5cEqtDxcDygkg9i3";
 				//
 				System.out.println("Connect to dropbox");
 				DbxClient client;
 				
 				
-				client = new DbxClient(config, accessToken);			
+				client = new DbxClient(config, dropboxSettings.getAccessToken());			
 				
 				DBAccess.getInstance().closeDB();
 				
