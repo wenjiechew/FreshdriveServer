@@ -1,9 +1,7 @@
 package nFileHandler;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.Date;
@@ -18,12 +16,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.JOptionPane;
 
 import com.dropbox.core.*;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import nDatabase.DBAccess;
 import nUtillities.AESCipher;
 import nUtillities.Logger;
@@ -35,6 +30,7 @@ import nUtillities.Logger;
 public class Upload extends HttpServlet {
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
+	PreparedStatement permissionStatement;
 	private static final long serialVersionUID = 1L;
 	static final int BUFFER_SIZE = 524288000;
 
@@ -181,6 +177,7 @@ public class Upload extends HttpServlet {
 			preparedStatement.setString(8, encryptedFilePath[2]);
 			preparedStatement.executeUpdate();
 			DBAccess.getInstance().closeDB();
+			insertIntoPermissions(fileName, owner_id);
 			return true;
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("openDB() ", e.toString());
@@ -188,6 +185,23 @@ public class Upload extends HttpServlet {
 			Logger.getInstance().PrintError("openDB() ", e.toString());
 		}
 		return false;
+	}
+	
+	public void insertIntoPermissions(String fileName, String ownerId){
+		try{
+		connection = DBAccess.getInstance().openDB();
+		// Get password for selected user account based on given username
+		preparedStatement = connection.prepareStatement("INSERT INTO permissions (permission_fileID, permission_sharedToUserID)"
+														+ "VALUES((SELECT file_ID FROM files WHERE file_name = '"+fileName+"'), '"+ownerId+"' )");
+		preparedStatement.executeUpdate();
+		DBAccess.getInstance().closeDB();
+		
+															
+		}catch (SQLException e) {
+			Logger.getInstance().PrintError("openDB() ", e.toString());
+		} catch (Exception e) {
+			Logger.getInstance().PrintError("openDB() ", e.toString());
+		}
 	}
 
 }

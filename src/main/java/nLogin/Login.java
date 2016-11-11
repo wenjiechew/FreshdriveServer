@@ -3,8 +3,6 @@ package nLogin;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import java.math.BigInteger;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,10 +21,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import nConstants.EmailSettings;
+
 import java.security.KeyManagementException;
 import java.security.SecureRandom;
 
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +40,8 @@ import nUtillities.Logger;
  */
 @WebServlet("/Login")
 public class Login extends HttpServlet {
+	private EmailSettings emailSettings = new EmailSettings();
+	
 	private static final long serialVersionUID = 1L;
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
@@ -68,11 +69,11 @@ public class Login extends HttpServlet {
 
 		response.setContentType("text/html");
 		if (Validate.checkUser(account)) {
-			if(Validate.isLoggedIn(account)==0){
-				// Active token existing; someone is currently logged in with the account
+			if (Validate.isLoggedIn(account) == 0) {
+				// Active token existing; someone is currently logged in with
+				// the account
 				out.println("active-token");
-			}
-			else{
+			} else {
 				Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Validate");
 				Logger.getInstance().PrintInfo("User name: " + account.getUsername());
 				try {
@@ -90,6 +91,7 @@ public class Login extends HttpServlet {
 			out.println("1");
 		}
 	}
+
 
 	public String getEmail(String userName) throws IOException, KeyManagementException, MessagingException {
 		String email = "";
@@ -123,20 +125,21 @@ public class Login extends HttpServlet {
 		System.out.println("Mail Server Properties have been setup successfully..");
 
 		// Step2
-		//Generate OTP for user
+		// Generate OTP for user
 		int OTP = randomSixDigitCode(account.getUsername());
-		if(OTP==0){
-			//OTP didn't get generated or stored properly
+		if (OTP == 0) {
+			// OTP didn't get generated or stored properly
 			return;
 		}
-		//Send Email
+		// Send Email
 		System.out.println("\n\n 2nd ===> get Mail Session..");
 		getMailSession = Session.getDefaultInstance(mailServerProperties, null);
 		generateMailMessage = new MimeMessage(getMailSession);
 		generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(account.getEmail()));
 		generateMailMessage.setSubject("Freshdrive Log in validation");
-		String emailBody = "Please enter the following code for validating your login: " + OTP
-				+ "<br><br> Regards, <br>Freshdrive Admin";
+		String emailBody = "Dear " + account.getUsername()
+				+ ",<br><br>Please enter the following code for validating your login: <b>" + OTP
+				+ "</b><br><br> Regards, <br>Freshdrive Admin<br><br> <br><br> <i>Please reply to this email if this log in was not authorised by you</i>";
 		generateMailMessage.setContent(emailBody, "text/html");
 		System.out.println("Mail Session has been created successfully..");
 
@@ -144,22 +147,22 @@ public class Login extends HttpServlet {
 		System.out.println("\n\n 3rd ===> Get Session and Send mail");
 		Transport transport = getMailSession.getTransport("smtp");
 
-		// TODO: Store email credentials somewhere safe?
-		transport.connect("smtp.gmail.com", "freshdrive3103@gmail.com", "Qwerty1@3$");
+		transport.connect("smtp.gmail.com", emailSettings.getEmailAddress() , emailSettings.getEmailPass());
 		transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
 		transport.close();
-		
-		//Make OTP expire after a specific time limit
+
+		// Make OTP expire after a specific time limit
 		executorService = Executors.newScheduledThreadPool(1);
-		executorService.schedule(()->{expireOTP(account.getUsername());}, 180L, TimeUnit.SECONDS);
+		executorService.schedule(() -> {
+			expireOTP(account.getUsername());
+		}, 180L, TimeUnit.SECONDS);
 	}
 
 	private void expireOTP(String username) {
 		try {
-			//Update database with generated OTP
+			// Update database with generated OTP
 			connection = DBAccess.getInstance().openDB();
-			preparedStatement = connection.prepareStatement("UPDATE users SET user_OTP=null "
-					+ "WHERE username=?");
+			preparedStatement = connection.prepareStatement("UPDATE users SET user_OTP=null " + "WHERE username=?");
 			preparedStatement.setString(1, username);
 			preparedStatement.executeUpdate();
 			DBAccess.getInstance().closeDB();
@@ -173,13 +176,13 @@ public class Login extends HttpServlet {
 	}
 
 	public int randomSixDigitCode(String username) {
-		//Randomization with SecureRandom for less chance of collision i.e. more securely & uniquely random OTP
+		// Randomization with SecureRandom for less chance of collision i.e.
+		// more securely & uniquely random OTP
 		int otp = sr.nextInt(900000) + 100000;
 		try {
-			//Update database with generated OTP
+			// Update database with generated OTP
 			connection = DBAccess.getInstance().openDB();
-			preparedStatement = connection.prepareStatement("UPDATE users SET user_OTP=? "
-					+ "WHERE username=?");
+			preparedStatement = connection.prepareStatement("UPDATE users SET user_OTP=? " + "WHERE username=?");
 			preparedStatement.setString(1, String.valueOf(otp));
 			preparedStatement.setString(2, username);
 			preparedStatement.executeUpdate();
@@ -190,7 +193,7 @@ public class Login extends HttpServlet {
 		} catch (Exception e) {
 			Logger.getInstance().PrintError("openDB() ", e.toString());
 			otp = 0;
-		}		
+		}
 		return otp;
 	}
 }

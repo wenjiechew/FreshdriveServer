@@ -60,16 +60,21 @@ public class Retrieve extends HttpServlet {
 			List<String> fileArray = new ArrayList<String>();
 			connection = DBAccess.getInstance().openDB();
 			// Get password for selected user account based on given username
-			preparedStatement = connection.prepareStatement("SELECT file_name from files WHERE file_ownerID = ?");
-			preparedStatement.setString(1, userID); 
+			preparedStatement = connection.prepareStatement("SELECT file_name, file_ID from files WHERE file_ID IN (SELECT permission_fileID from permissions where permission_sharedToUserID = '"+userID+"')");
+//			preparedStatement.setString(1, userID); 
 			rset = preparedStatement.executeQuery();
 			while (rset.next()) {
-				array.add(rset.getString(1));
+				String  fileName_json=rset.getString("file_name");
+			    String FileId_json=rset.getString("file_ID");
+			    JsonObject jObj = new JsonObject();
+			    jObj.addProperty("fileId", FileId_json);
+			    jObj.addProperty("fileName", fileName_json);
+			    array.add(jObj);
 			}
 			
 			obj.add("fileNames", array);
 //			System.out.println("json array pos 2"+array.get(2).toString());
-//			System.out.println("GSON to JSON: "+ gson.toJson(array));
+			System.out.println("GSON to JSON: "+ gson.toJson(array));
 			System.out.println("GSON to JSON: "+ gson.toJson(obj));
 			
 		} catch (SQLException e) {
