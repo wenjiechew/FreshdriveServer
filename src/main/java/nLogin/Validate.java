@@ -94,9 +94,9 @@ public class Validate {
 			done = preparedStatement.executeUpdate();
 			DBAccess.getInstance().closeDB();
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
+			Logger.getInstance().PrintError("clearTokenOnLogout SQL ex ", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
+			Logger.getInstance().PrintError("clearTokenOnLogout ex ", e.toString());
 		}
 		return done;
 	}
@@ -119,10 +119,32 @@ public class Validate {
 				return 1;
 			DBAccess.getInstance().closeDB();
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
+			Logger.getInstance().PrintError("VerifyOTP SQL ex ", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
+			Logger.getInstance().PrintError("VerifyOTP SQL ex ", e.toString());
 		}
 		return 0;
+	}
+	
+	//Verify a provided access token against the database records
+	public static int verifyToken(String token, String username){
+		int rsCount = 0;
+		try{
+			connection = DBAccess.getInstance().openDB();
+			//Get password for selected user account based on given username
+			preparedStatement = connection.prepareStatement("SELECT COUNT(*) FROM "
+					+ "users WHERE username=? AND user_token=?");
+			preparedStatement.setString(1, username);
+			preparedStatement.setString(2, token);
+			ResultSet rs = preparedStatement.executeQuery();
+			if(rs.next())
+				rsCount = rs.getInt("COUNT(*)");
+			DBAccess.getInstance().closeDB();
+		} catch (SQLException e) {
+			Logger.getInstance().PrintError("VerifyToken SQL exception ", e.toString());
+		} catch (Exception e) {
+			Logger.getInstance().PrintError("VerifyToken exception ", e.toString());
+		}
+		return rsCount;
 	}
 }

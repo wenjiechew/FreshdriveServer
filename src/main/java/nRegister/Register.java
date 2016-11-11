@@ -31,7 +31,6 @@ public class Register extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("username") + " AND " + request.getParameter("password"));
 		
 		response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
@@ -48,8 +47,7 @@ public class Register extends HttpServlet {
             
         }
         else {
-            Logger.getInstance().PrintInfo("Account : is NOT Validate");
-            //TODO Keep track of number of times user has failed login
+            Logger.getInstance().PrintInfo("Account : is NOT Registered");
 			response.setContentType("text/html" );
 			
 			out.println("1");
