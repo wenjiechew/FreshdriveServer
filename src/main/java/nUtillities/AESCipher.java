@@ -10,10 +10,13 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import nConstants.AESConstants;
+
 public class AESCipher {
+	private static AESConstants aesConstants = new AESConstants();
 	private static SecretKey key;
 	//TODO: Save the password somewhere else, maybe in a text file and retrieve it
-	private static char[] password = new char[]{'p','a','s','s','w','o','r','d'};
+	private static char[] password = null;
 	
 	public static byte[] generateSalt(){
 		SecureRandom randomSalt = new SecureRandom();
@@ -25,6 +28,7 @@ public class AESCipher {
 	
 	public static SecretKey getKey(byte[] salt){
 		try {
+			password = aesConstants.getAESPass().toCharArray();
 			/* Derive the key, given password and salt. */
 			SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
 			KeySpec spec = new PBEKeySpec(password, salt, 65536, 256);

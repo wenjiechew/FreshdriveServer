@@ -18,7 +18,7 @@ public class ExpiryFileRemove {
 				connection = DBAccess.getInstance().openDB();
 				
 				//Get All file_id of the Files that is before current dates
-				preparedStatement = connection.prepareStatement(Constants.DELETE_FILEIDS);
+				preparedStatement = connection.prepareStatement(Constants.getDELETE_FILEIDS());
 				
 				int rowsDel = preparedStatement.executeUpdate();
 				

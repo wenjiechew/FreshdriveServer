@@ -15,7 +15,7 @@ public class Validate {
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
 
-	public static boolean checkUser(Account account) {
+	public static boolean checkUser(Account account ) {
         String password = account.getPassword();
 		Logger.getInstance().PrintInfo("CheckUser()", "Checking User " + account.getUsername() + " PW: " + password);
 		boolean valid = false;

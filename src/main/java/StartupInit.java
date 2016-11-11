@@ -7,12 +7,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import nConstants.Constants;
 import nFileHandler.ExpiryFileRemove;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
-
 /**
  * Application Lifecycle Listener implementation class StartupInit
  *
@@ -35,6 +31,8 @@ public class StartupInit implements ServletContextListener {
     	System.out.println("HOLLA");
 
     	initialDelay = new Date( midnight.getTime() - System.currentTimeMillis() ).getTime();
+    	
+    	
     }
 
 	/**
@@ -49,8 +47,9 @@ public class StartupInit implements ServletContextListener {
      * @see ServletContextListener#contextInitialized(ServletContextEvent)
      */
     public void contextInitialized(ServletContextEvent sce)  { 
-         executorService.scheduleAtFixedRate(() -> {
- 			
+    	Constants.setCurrentPath( sce.getServletContext().getRealPath("/") );
+    	
+        executorService.scheduleAtFixedRate(() -> {
  			ExpiryFileRemove.checkFileExpire();		
  			
  		},0 , 60000L, TimeUnit.MILLISECONDS);

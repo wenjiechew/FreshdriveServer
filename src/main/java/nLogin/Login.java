@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import nConstants.EmailSettings;
+
 import java.security.KeyManagementException;
 import java.security.SecureRandom;
 
@@ -38,6 +40,8 @@ import nUtillities.Logger;
  */
 @WebServlet("/Login")
 public class Login extends HttpServlet {
+	private EmailSettings emailSettings = new EmailSettings();
+	
 	private static final long serialVersionUID = 1L;
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
@@ -53,6 +57,8 @@ public class Login extends HttpServlet {
 			throws ServletException, IOException {
 		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("username") + " AND "
 				+ request.getParameter("password"));
+		
+		
 
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
@@ -60,7 +66,7 @@ public class Login extends HttpServlet {
 		Account account = new Account();
 		account.setUsername(request.getParameter("username"));
 		account.setPassword(request.getParameter("password"));
-		if (Validate.checkUser(account)) {
+		if (Validate.checkUser(account )) {
 			Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Validate");
 			Logger.getInstance().PrintInfo("User name: " + account.getUsername());
 			try {
@@ -119,6 +125,8 @@ public class Login extends HttpServlet {
 	}
 
 	public void sendEmail(String email) throws IOException, KeyManagementException, MessagingException {
+
+		
 		// Step1
 		System.out.println("\n 1st ===> setup Mail Server Properties..");
 		mailServerProperties = System.getProperties();
@@ -140,6 +148,7 @@ public class Login extends HttpServlet {
 
 		// Step3
 		System.out.println("\n\n 3rd ===> Get Session and Send mail");
+		
 		Transport transport = getMailSession.getTransport("smtp");
 
 		// for testing purposes you can enter your gmail account and pw.However
@@ -148,7 +157,7 @@ public class Login extends HttpServlet {
 		// https://www.google.com/settings/security/lesssecureapps
 		// ideally creating a gmail account specfic for freshdrive would be
 		// better
-		transport.connect("smtp.gmail.com", "freshdrive3103@gmail.com", "Qwerty1@3$");
+		transport.connect("smtp.gmail.com", emailSettings.getEmailAddress() , emailSettings.getEmailPass());
 		transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
 		transport.close();
 	}

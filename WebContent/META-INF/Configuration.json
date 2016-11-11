@@ -1,0 +1,11 @@
+{
+	"DB_URL": "jdbc:mysql://localhost:3306/freshdrivedb",
+	"DB_USER": "root",
+	"DB_PASS": "",
+	"Email": "freshdrive3103@gmail.com",
+	"EmailPass": "Qwerty1@3$",
+	
+	"AESPass": [ "p", "a", "s", "s", "w", "o", "r", "d"]	
+	
+}
+
