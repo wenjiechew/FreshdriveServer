@@ -27,9 +27,10 @@ public class ShareFile extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("users")+ " AND " + request.getParameter("fileID"));
+		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("users")+ ", " + request.getParameter("ownerID") + " AND " + request.getParameter("filename"));
 		
-		String fileID = request.getParameter("fileID");
+		String fileName = request.getParameter("filename");
+		int ownerID = Integer.parseInt(request.getParameter("ownerID"));
 		
 		response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
@@ -40,31 +41,71 @@ public class ShareFile extends HttpServlet {
         List<String> errorUserList = new ArrayList<String>();
         List<Integer> userIDs = new ArrayList<Integer>();
         
-        if (validateFile(fileID)){
-        	
-        	for (int i = 0; i < userArray.length; i++){
-            	int userValidity = validateUser(userArray[i]);
-            	
-                if (userValidity != 0) {
-                	System.out.println(userArray[i] + " is validated.");
-                	userIDs.add(userValidity);
-                }
-                else
-                {
-                	System.out.println(userArray[i] + " is not validated.");
-                	errorUserList.add(userArray[i]);
-                }
-            }
-        	
-        	shareFile(userIDs, Integer.parseInt(fileID));
-        	if (errorUserList.size() != 0){
-            	out.print(errorUserList);
-        	}
+        int fileID = getFileID(ownerID, fileName);
+        
+        if (fileID != 0){
+	        if (validateFile(fileID)){
+	        	
+	        	for (int i = 0; i < userArray.length; i++){
+	            	int userValidity = validateUser(userArray[i]);
+	            	
+	                if (userValidity != 0) {
+	                	System.out.println(userArray[i] + " is validated.");
+	                	userIDs.add(userValidity);
+	                }
+	                else
+	                {
+	                	System.out.println(userArray[i] + " is not validated.");
+	                	errorUserList.add(userArray[i]);
+	                }
+	            }
+	        	
+	        	shareFile(userIDs, fileID);
+	        	if (errorUserList.size() != 0){
+	            	out.print(errorUserList);
+	        	}
+	        }
+	        else
+	        {
+	        	out.print("File");
+	        }
         }
         else
         {
         	out.print("File");
         }
+	}
+	
+	public static int getFileID(int ownerID, String fileName){
+		int fileID = 0;
+		
+		try {
+			connection = DBAccess.getInstance().openDB();
+			preparedStatement = connection.prepareStatement("SELECT file_ID FROM "
+					+ "files WHERE file_ownerID=? AND file_name=?");
+			
+			preparedStatement.setInt(1, ownerID);
+			preparedStatement.setString(2, fileName);
+			ResultSet rs = preparedStatement.executeQuery();
+			
+			if(rs.next()){
+				fileID = rs.getInt("file_ID");
+				System.out.println("getFileID(): " + fileName + " is retrieved with fileID, " + fileID);
+				Logger.getInstance().PrintInfo("getFileID(): " + fileName + " is retrieved with fileID, " + fileID);
+			}
+			else
+			{
+				System.out.println("getFileID(): " + fileName + " not found.");
+				Logger.getInstance().PrintInfo("getFileID(): " + fileName + " not found.");
+				fileID = 0;
+			}
+			
+			DBAccess.getInstance().closeDB();
+		} catch (Exception e) {
+			System.out.println("getFileID(): " + e.toString());
+			Logger.getInstance().PrintError("getFileID() ", e.toString());
+		}
+		return fileID;
 	}
 	
 	public static int shareFile(List<Integer> users, int fileID){
@@ -129,7 +170,7 @@ public class ShareFile extends HttpServlet {
 		return userID;
 	}
 	
-	public static boolean validateFile(String fileID){
+	public static boolean validateFile(int fileID){
 		boolean valid = false;
 		
 		try {
@@ -137,7 +178,7 @@ public class ShareFile extends HttpServlet {
 			preparedStatement = connection.prepareStatement("SELECT * FROM "
 					+ "files WHERE file_ID=?");
 			
-			preparedStatement.setString(1, fileID);
+			preparedStatement.setInt(1, fileID);
 			ResultSet rs = preparedStatement.executeQuery();
 			
 			if(rs.next()){
