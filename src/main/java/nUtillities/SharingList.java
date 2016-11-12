@@ -114,8 +114,9 @@ public class SharingList extends HttpServlet {
 		List<Integer> sharedUsers = new ArrayList<Integer>();
 		try {
 			connection = DBAccess.getInstance().openDB();
-			preparedStatement = connection.prepareStatement("SELECT permission_sharedToUserID FROM "
-					+ "permissions WHERE permission_fileID=?");
+			preparedStatement = connection.prepareStatement("SELECT p.permission_sharedToUserID FROM "
+					+ "permissions p JOIN files f WHERE p.permission_fileID=? "
+					+ "AND p.permission_sharedToUserID != f.file_ownerID");
 			
 			preparedStatement.setInt(1, fileID);
 			ResultSet rs = preparedStatement.executeQuery();

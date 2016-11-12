@@ -62,8 +62,18 @@ public class AESCipher {
 			System.out.println("[Information] " + filePath + " has been encrypted.");
 			System.out.println("[Information] IV: " + iv.toString());
 			System.out.println("[Information] Cipher: " + ciphertext.toString());
-			//TODO: Return salt, IV and encrypted string to save in database
-			String[] fileInfo = {ciphertext.toString(), iv.toString(), salt.toString()};
+			
+			String cipherString = new String(ciphertext, "ISO-8859-1");
+			String ivString = new String(iv, "ISO-8859-1");
+			String saltString = new String(salt, "ISO-8859-1");
+			String[] fileInfo = {cipherString, ivString, saltString};
+					
+			/* TODO: @Jianhong Take these three to convert database string into bytes, remove this comment after you've done so!
+			byte[] cipherByte = cipherString.getBytes("ISO-8859-1");
+			byte[] ivByte = ivString.getBytes("ISO-8859-1");
+			byte[] saltByte = saltString.getBytes("ISO-8859-1");
+			*/
+
 			return fileInfo;
 		}
 		catch (Exception ex)
