@@ -75,6 +75,11 @@ public class SharingList extends HttpServlet {
 	    }
     }
 	
+	/**
+	 * Retrieve the username of a user
+	 * @param userID
+	 * @return username
+	 */
 	public static String getSharedUsernames(int userID){
 		String username = null;
 		try {
@@ -100,6 +105,11 @@ public class SharingList extends HttpServlet {
 		return username;
 	}
 
+	/**
+	 * Retrieve a list of users who has access to specific file
+	 * @param fileID
+	 * @return list of userIDs with access to file or null (unshared file)
+	 */
 	public static List<Integer> getSharingUsers(int fileID){
 		List<Integer> sharedUsers = new ArrayList<Integer>();
 		try {
