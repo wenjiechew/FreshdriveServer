@@ -163,20 +163,24 @@ public class Upload extends HttpServlet {
 			} else {
 				expireDate = Date.valueOf(expireOn);
 			}
-			String[] encryptedFilePath = AESCipher.EncryptString(filePath);
+			byte[][] encryptedFilePath = AESCipher.EncryptString(filePath);
+			byte[] pathByte = encryptedFilePath[0];
+			byte[] ivByte = encryptedFilePath[1];
+			byte[] saltByte = encryptedFilePath[2];
+			
 			connection = DBAccess.getInstance().openDB();
 			// Get password for selected user account based on given username
 			preparedStatement = connection.prepareStatement(
 					"INSERT INTO files (file_name, file_path, file_size, file_createdOn, file_ownerID, file_expireOn, file_salt, file_iv) "
 							+ "VALUES (?,?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, fileName);
-			preparedStatement.setString(2, encryptedFilePath[0]);
+			preparedStatement.setBytes(2, pathByte);
 			preparedStatement.setString(3, Long.toString(fileLength));
 			preparedStatement.setString(4, createdOn);
 			preparedStatement.setString(5, owner_id);
 			preparedStatement.setDate(6, expireDate);
-			preparedStatement.setString(7, encryptedFilePath[2]);
-			preparedStatement.setString(8, encryptedFilePath[1]);
+			preparedStatement.setBytes(7, saltByte);
+			preparedStatement.setBytes(8, ivByte);
 			preparedStatement.executeUpdate();
 			DBAccess.getInstance().closeDB();
 			insertIntoPermissions(fileName, owner_id);

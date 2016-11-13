@@ -52,23 +52,19 @@ public class Download extends HttpServlet {
 			preparedStatement = connection.prepareStatement("SELECT file_path, file_salt, file_iv FROM files WHERE file_ID = ?");
 			preparedStatement.setInt(1, fileID);
 			ResultSet rset = preparedStatement.executeQuery();
-			String encryptedPath = "";
-			String fileIv = "";
-			String fileSalt = "";
+			byte[] encryptedPath = null;
+			byte[] fileIv = null;
+			byte[] fileSalt = null;
 			while(rset.next()){
-				encryptedPath = rset.getString("file_path");
-				fileIv = rset.getString("file_iv");
-				fileSalt = rset.getString("file_salt");
+				encryptedPath = rset.getBytes("file_path");
+				fileIv = rset.getBytes("file_iv");
+				fileSalt = rset.getBytes("file_salt");
 				System.out.println("Encrypted path: "+encryptedPath);
 				System.out.println("Encrypted IV: "+fileIv);
 				System.out.println("Encrypted Salt: "+fileSalt);
 			}
-		
-			byte[] encryptBytes = encryptedPath.getBytes("ISO-8859-1");
-			byte[] ivBytes = fileIv.getBytes("ISO-8859-1");
-			byte[] saltBytes = fileSalt.getBytes("ISO-8859-1");
 			
-			String decryptedString = AESCipher.DecryptString(encryptBytes, ivBytes, saltBytes);
+			String decryptedString = AESCipher.DecryptString(encryptedPath, fileIv, fileSalt);
 			System.out.println("decrypted string: "+ decryptedString);
 //			
 		}catch (SQLException e) {

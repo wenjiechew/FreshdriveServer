@@ -49,7 +49,7 @@ public class AESCipher {
 	 This updates the restricted policies to unlimited policies to allow for a larger key size.
 	 
 	 "InvalidKeyException: Illegal Key Size" error may occur if not done.*/
-	public static String[] EncryptString (String filePath){
+	public static byte[][] EncryptString (String filePath){
 		try {
 			/*Generate a 8 byte SecureRandom salt*/
 			byte[] salt = generateSalt();
@@ -63,17 +63,7 @@ public class AESCipher {
 			System.out.println("[Information] IV: " + iv.toString());
 			System.out.println("[Information] Cipher: " + ciphertext.toString());
 			
-			String cipherString = new String(ciphertext, "ISO-8859-1");
-			String ivString = new String(iv, "ISO-8859-1");
-			String saltString = new String(salt, "ISO-8859-1");
-			String[] fileInfo = {cipherString, ivString, saltString};
-					
-			/* TODO: @Jianhong Take these three to convert database string into bytes, remove this comment after you've done so!
-			byte[] cipherByte = cipherString.getBytes("ISO-8859-1");
-			byte[] ivByte = ivString.getBytes("ISO-8859-1");
-			byte[] saltByte = saltString.getBytes("ISO-8859-1");
-			*/
-
+			byte[][] fileInfo = {ciphertext, iv, salt};
 			return fileInfo;
 		}
 		catch (Exception ex)
