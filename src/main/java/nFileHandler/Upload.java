@@ -175,8 +175,8 @@ public class Upload extends HttpServlet {
 			preparedStatement.setString(4, createdOn);
 			preparedStatement.setString(5, owner_id);
 			preparedStatement.setDate(6, expireDate);
-			preparedStatement.setString(7, encryptedFilePath[1]);
-			preparedStatement.setString(8, encryptedFilePath[2]);
+			preparedStatement.setString(7, encryptedFilePath[2]);
+			preparedStatement.setString(8, encryptedFilePath[1]);
 			preparedStatement.executeUpdate();
 			DBAccess.getInstance().closeDB();
 			insertIntoPermissions(fileName, owner_id);
