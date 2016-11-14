@@ -19,7 +19,7 @@ import nFileHandler.ExpiryFileRemove;
  */
 @WebListener
 public class StartupInit implements ServletContextListener {
-	private long Delay;
+	private long initialDelay;
 	private static final long PERIOD = 86400000L;
 	Calendar time = Calendar.getInstance();
 	
@@ -36,7 +36,7 @@ public class StartupInit implements ServletContextListener {
     	time.set(Calendar.MINUTE, 59);
     	time.set(Calendar.SECOND, 60);
 
-    	Delay = time.getTimeInMillis() - System.currentTimeMillis();
+    	initialDelay = time.getTimeInMillis() - System.currentTimeMillis();
     }
 
 	/**
@@ -63,7 +63,7 @@ public class StartupInit implements ServletContextListener {
 // 			
 // 			ExpiryFileRemove.checkFileExpire();		
 // 			
-// 		},Delay , PERIOD, TimeUnit.MILLISECONDS);
+// 		},initialDelay , PERIOD, TimeUnit.MILLISECONDS);
     }
 	
 }

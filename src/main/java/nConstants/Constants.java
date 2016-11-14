@@ -1,5 +1,10 @@
 package nConstants;
 
+/**
+ * This File is a Collects all Constants Variables that is used throughout the application, to prevent REPEATATIVE CODES
+ * @author WenJieChew
+ *
+ */
 public class Constants {
 	static String currentPath = null;
 	static String FileLocation = "/META-INF/Configuration.json";

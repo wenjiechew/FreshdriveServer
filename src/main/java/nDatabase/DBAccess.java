@@ -9,6 +9,7 @@ import nConstants.DBSettings;
 import nUtillities.Logger;
 
 /**
+ * The Class is create a Connection with the mySQL database.
  * @author WenJieChew
  *
  */
@@ -24,9 +25,13 @@ public class DBAccess {
 	
 	private Connection connection;
 	
-	public Connection openDB() throws SQLException, Exception{
-		Logger.getInstance().PrintInfo("OpenDB ()", "Connecting to database..." );
-		
+	/**
+	 * Gets mySQL's JDBC Driver Class 
+	 * @return returns an Open connection with the Database, with the Database ( URL, User name and database's password )
+	 * @throws SQLException
+	 * @throws Exception
+	 */
+	public Connection openDB() throws SQLException, Exception{		
 		//Register JDBC
 		Class.forName( Constants.JDBC_DRIVER );
 		
@@ -37,8 +42,6 @@ public class DBAccess {
 	}
 	
 	public void closeDB() throws SQLException {
-		Logger.getInstance().PrintInfo("CloseDB()", "Closing Database...");
-
 		connection.close();
 		
 		Logger.getInstance().PrintInfo("Database is Closed");

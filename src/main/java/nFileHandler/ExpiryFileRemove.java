@@ -53,7 +53,7 @@ public class ExpiryFileRemove {
 					
 					//Delete this files from DropBox
 					client.delete( AESCipher.DecryptString( result.getBytes("file_path") , result.getBytes("file_iv") , result.getBytes("file_salt") ));
-					Logger.getInstance().PrintInfo( result.getString("file_name") + " is deleted");
+					Logger.getInstance().PrintInfo( result.getString("file_name") + " is deleted" );
 				}while (result.next());
 				
 				//Remove Expired from List
@@ -97,7 +97,7 @@ public class ExpiryFileRemove {
 		findFileStatement = connection.prepareStatement( Constants.DELETE_FileIDs );
 		int rowsDel = findFileStatement.executeUpdate();
 		
-		Logger.getInstance().PrintInfo("Total of " + rowsDel + " files is being deleted" );
+		Logger.getInstance().PrintInfo("Total of " + rowsDel + " files is being deleted at " + new java.util.Date() );
 	}
 	
 
