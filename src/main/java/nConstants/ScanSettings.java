@@ -13,26 +13,31 @@ import org.json.simple.parser.JSONParser;
  *
  */
 public class ScanSettings {
-	private JSONParser parser = new JSONParser();
+	private static ScanSettings instance;
+	private static JSONParser parser = new JSONParser();
 	
-	private String ScanKey = null;
+	private static String ScanKey = null;
 
 	/**
 	 * 
 	 */
-	public ScanSettings() {
-		readJSONFile();
+	public static ScanSettings getInstance() {
+		if( instance == null){
+			instance =  new ScanSettings();
+			readJSONFile();
+		}
+		return instance;
 	}
 
 	public String getScanKey() {
 		return ScanKey;
 	}
 
-	private void setScanKey(String scanKey) {
+	private static void setScanKey(String scanKey) {
 		ScanKey = scanKey;
 	}
 	
-	private void readJSONFile(){
+	private static void readJSONFile(){
 
         try { 
             Object obj = parser.parse(new FileReader(

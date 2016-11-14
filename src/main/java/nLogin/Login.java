@@ -40,7 +40,7 @@ import nUtillities.Logger;
  */
 @WebServlet("/Login")
 public class Login extends HttpServlet {
-	private EmailSettings emailSettings = new EmailSettings();
+	private EmailSettings emailSettings = EmailSettings.getInstance();
 	
 	private static final long serialVersionUID = 1L;
 	private static Connection connection;

@@ -55,7 +55,7 @@ public class StartupInit implements ServletContextListener {
     	Constants.setCurrentPath( sce.getServletContext().getRealPath("/") );
     	
         executorService.scheduleAtFixedRate(() -> {
- 			ExpiryFileRemove.checkFileExpire();		
+ 			ExpiryFileRemove.deleteFileExpired();;		
  			
  		},0 , 300000L, TimeUnit.MILLISECONDS);
  		
