@@ -34,6 +34,7 @@ import java.util.Properties;
 import nDatabase.DBAccess;
 import nObjectModel.Account;
 import nUtillities.Logger;
+import nUtillities.Log;
 
 /**
  * Servlet implementation class Login
@@ -50,6 +51,7 @@ public class Login extends HttpServlet {
 	private static MimeMessage generateMailMessage;
 	private SecureRandom sr = new SecureRandom();
 	private ScheduledExecutorService executorService;
+	private static Log Log = new Log();
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
@@ -62,7 +64,7 @@ public class Login extends HttpServlet {
 
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
-
+		
 		Account account = new Account();
 		account.setUsername(request.getParameter("username"));
 		account.setPassword(request.getParameter("password"));
@@ -76,6 +78,7 @@ public class Login extends HttpServlet {
 			} else {
 				Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Validate");
 				Logger.getInstance().PrintInfo("User name: " + account.getUsername());
+				Log.log("Login Sucessful");
 				try {
 					account.setEmail(getEmail(account.getUsername()));
 					sendEmail(account);
