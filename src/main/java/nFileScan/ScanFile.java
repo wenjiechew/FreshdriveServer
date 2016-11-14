@@ -10,23 +10,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import nConstants.ScanSettings;
+import nLogin.Validate;
 
 /**
  * Servlet implementation class ScanFile
+ * This Servlet returns upon a POST and checked if user is valid (username and Token)
+ * then returns Virus Scan Key
  */
 @WebServlet("/ScanFile")
 public class ScanFile extends HttpServlet {
 	private static ScanSettings scanSettings = ScanSettings.getInstance();
 	private static final long serialVersionUID = 1L;
        
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public ScanFile() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -34,8 +29,15 @@ public class ScanFile extends HttpServlet {
 		// TODO Auto-generated method stub
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
+		if(Validate.verifyToken(
+				request.getParameter("user_token"), request.getParameter("username")) == 1){			
+			
+			out.println( scanSettings.getScanKey() );
+		}else {
+			out.println("1");
+		}
 		
-		out.println( scanSettings.getScanKey() );
+		
 	}
 
 }

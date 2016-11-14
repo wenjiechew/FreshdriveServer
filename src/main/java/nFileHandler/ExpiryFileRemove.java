@@ -63,7 +63,11 @@ public class ExpiryFileRemove {
 				Logger.getInstance().PrintInfo("There are no files Expire today");
 			}
 
+			result.close();
+			findFileStatement.close();
 			connection.close();
+			Logger.getInstance().PrintInfo("Database is Closed");
+			
 			
 			
 		}catch(SQLException e){

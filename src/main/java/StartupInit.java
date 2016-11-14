@@ -1,3 +1,4 @@
+import java.sql.SQLException;
 import java.util.Calendar;
 
 import java.util.concurrent.Executors;
@@ -9,6 +10,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import nConstants.Constants;
+import nDatabase.DBAccess;
 import nFileHandler.ExpiryFileRemove;
 
 /**
@@ -45,6 +47,11 @@ public class StartupInit implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce)  { 
         
     	executorService.shutdown();
+    	try {
+			DBAccess.getInstance().closeDB();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
     }
 
 	/**
