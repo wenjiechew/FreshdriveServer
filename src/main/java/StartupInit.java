@@ -55,22 +55,17 @@ public class StartupInit implements ServletContextListener {
     }
 
 	/**
-	 * 
+	 * Initialised The Schedule to Run at Midnight everyday
      * @see ServletContextListener#contextInitialized(ServletContextEvent)
      */
     public void contextInitialized(ServletContextEvent sce)  { 
     	Constants.setCurrentPath( sce.getServletContext().getRealPath("/") );
     	
-        executorService.scheduleAtFixedRate(() -> {
- 			ExpiryFileRemove.deleteFileExpired();;		
+ 		executorService.scheduleAtFixedRate(() -> {
  			
- 		},0 , 300000L, TimeUnit.MILLISECONDS);
- 		
-// 		executorService.scheduleAtFixedRate(() -> {
-// 			
-// 			ExpiryFileRemove.checkFileExpire();		
-// 			
-// 		},initialDelay , PERIOD, TimeUnit.MILLISECONDS);
+ 			ExpiryFileRemove.deleteFileExpired();		
+ 			
+ 		},initialDelay , PERIOD, TimeUnit.MILLISECONDS);
     }
 	
 }
