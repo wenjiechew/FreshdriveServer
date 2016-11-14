@@ -64,7 +64,10 @@ public class Register extends HttpServlet {
 			preparedStatement.setString(2, account.getEmail());
 			preparedStatement.setString(3, account.getPassword());
 			preparedStatement.executeUpdate();
-			DBAccess.getInstance().closeDB();
+
+
+			preparedStatement.close();
+			connection.close();
 			return true;
 			
 		} catch (SQLException e) {

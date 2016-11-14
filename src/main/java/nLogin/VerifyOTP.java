@@ -74,7 +74,10 @@ public class VerifyOTP extends HttpServlet {
 			ResultSet rs = preparedStatement.executeQuery();
 			if(rs.next())
 				info = rs.getString("user_ID")+"-"+rs.getString("username")+"-"+rs.getString("user_email")+"-"+rs.getString("user_token");
-			DBAccess.getInstance().closeDB();
+			
+			rs.close();
+			preparedStatement.close();
+			connection.close();
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("openDB() ", e.toString());
 		} catch (Exception e) {

@@ -34,14 +34,6 @@ public class SharingList extends HttpServlet {
     }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-
-	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -96,7 +88,9 @@ public class SharingList extends HttpServlet {
 				Logger.getInstance().PrintInfo("getSharedUsernames(): Added " + username);
 			}
 			
-			DBAccess.getInstance().closeDB();
+			rs.close();
+			preparedStatement.close();
+			connection.close();
 		} catch (Exception e) {
 			System.out.println("getSharedUsernames(): " + e.toString());
 			Logger.getInstance().PrintError("getSharedUsernames() ", e.toString());
@@ -135,7 +129,9 @@ public class SharingList extends HttpServlet {
 				sharedUsers = null;
 			}
 			
-			DBAccess.getInstance().closeDB();
+			rs.close();
+			preparedStatement.close();
+			connection.close();
 		} catch (Exception e) {
 			System.out.println("getSharingUsers(): " + e.toString());
 			Logger.getInstance().PrintError("getSharingUsers() ", e.toString());

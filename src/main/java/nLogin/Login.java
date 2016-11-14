@@ -108,7 +108,10 @@ public class Login extends HttpServlet {
 			if (rs.next()) {
 				email = rs.getString("user_email");
 			}
-			DBAccess.getInstance().closeDB();
+			
+			rs.close();
+			preparedStatement.close();
+			connection.close();
 
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("openDB() ", e.toString());
@@ -168,7 +171,9 @@ public class Login extends HttpServlet {
 			preparedStatement = connection.prepareStatement("UPDATE users SET user_OTP=null " + "WHERE username=?");
 			preparedStatement.setString(1, username);
 			preparedStatement.executeUpdate();
-			DBAccess.getInstance().closeDB();
+
+			preparedStatement.close();
+			connection.close();
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("openDB() DB Error", e.toString());
 		} catch (Exception e) {
@@ -189,7 +194,9 @@ public class Login extends HttpServlet {
 			preparedStatement.setString(1, String.valueOf(otp));
 			preparedStatement.setString(2, username);
 			preparedStatement.executeUpdate();
-			DBAccess.getInstance().closeDB();
+
+			preparedStatement.close();
+			connection.close();;
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("openDB() DB Error", e.toString());
 			otp = 0;

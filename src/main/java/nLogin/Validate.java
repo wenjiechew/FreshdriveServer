@@ -55,7 +55,11 @@ public class Validate {
 			ResultSet results = preparedStatement.executeQuery();
 			if (results.next())
 				rs = results.getInt("COUNT(*)");
-			DBAccess.getInstance().closeDB();
+
+
+			results.close();
+			preparedStatement.close();
+			connection.close();
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("openDB() ", e.toString());
 		} catch (Exception e) {
@@ -74,7 +78,9 @@ public class Validate {
 			preparedStatement.setString(1, token);
 			preparedStatement.setString(2, username);
 			rs = preparedStatement.executeUpdate();
-			DBAccess.getInstance().closeDB();
+
+			preparedStatement.close();
+			connection.close();
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("openDB() ", e.toString());
 		} catch (Exception e) {
@@ -92,7 +98,9 @@ public class Validate {
 					.prepareStatement("UPDATE users SET user_token=NULL,user_OTP=NULL WHERE username=?");
 			preparedStatement.setString(1, username);
 			done = preparedStatement.executeUpdate();
-			DBAccess.getInstance().closeDB();
+
+			preparedStatement.close();
+			connection.close();
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("clearTokenOnLogout SQL ex ", e.toString());
 		} catch (Exception e) {
@@ -116,7 +124,11 @@ public class Validate {
 				return -1;
 			if (dbOTP.equals(code))
 				return 1;
-			DBAccess.getInstance().closeDB();
+
+
+			rs.close();
+			preparedStatement.close();
+			connection.close();
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("VerifyOTP SQL ex ", e.toString());
 		} catch (Exception e) {
@@ -138,7 +150,10 @@ public class Validate {
 			ResultSet rs = preparedStatement.executeQuery();
 			if(rs.next())
 				rsCount = rs.getInt("COUNT(*)");
-			DBAccess.getInstance().closeDB();
+
+			rs.close();
+			preparedStatement.close();
+			connection.close();
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("VerifyToken SQL exception ", e.toString());
 		} catch (Exception e) {

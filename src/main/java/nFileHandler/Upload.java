@@ -150,6 +150,9 @@ public class Upload extends HttpServlet {
 			}
 
 		}
+		rset.close();
+		preparedStatement.close();
+		connection.close();
 //		System.out.println("COUNTER: "+count);
 		return (count == 0);
 	}
@@ -182,7 +185,10 @@ public class Upload extends HttpServlet {
 			preparedStatement.setBytes(7, saltByte);
 			preparedStatement.setBytes(8, ivByte);
 			preparedStatement.executeUpdate();
-			DBAccess.getInstance().closeDB();
+
+
+			preparedStatement.close();
+			connection.close();
 			insertIntoPermissions(fileName, owner_id);
 			return true;
 		} catch (SQLException e) {
@@ -200,7 +206,9 @@ public class Upload extends HttpServlet {
 		preparedStatement = connection.prepareStatement("INSERT INTO permissions (permission_fileID, permission_sharedToUserID)"
 														+ "VALUES((SELECT file_ID FROM files WHERE file_name = '"+fileName+"' AND file_ownerID = '"+ownerId+"'), '"+ownerId+"' )");
 		preparedStatement.executeUpdate();
-		DBAccess.getInstance().closeDB();
+		
+		preparedStatement.close();
+		connection.close();
 		
 															
 		}catch (SQLException e) {
