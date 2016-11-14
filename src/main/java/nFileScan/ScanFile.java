@@ -16,7 +16,7 @@ import nConstants.ScanSettings;
  */
 @WebServlet("/ScanFile")
 public class ScanFile extends HttpServlet {
-	private static ScanSettings scanSettings = new ScanSettings();
+	private static ScanSettings scanSettings = ScanSettings.getInstance();
 	private static final long serialVersionUID = 1L;
        
     /**

@@ -15,24 +15,29 @@ import org.json.simple.parser.JSONParser;
  *
  */
 public class DBSettings {	
-	private JSONParser parser = new JSONParser();
+	private static DBSettings instance;
+	private static JSONParser parser = new JSONParser();
 	
-	private String DB_URL = null;
-	private String DB_USER = null;
-	private String DB_PASS = null;	
+	private static String DB_URL = null;
+	private static String DB_USER = null;
+	private static String DB_PASS = null;	
 	
 	/**
 	 * 
 	 */
-	public DBSettings() {
-		readJSONFile();
+	public static DBSettings getInstance() {
+		if( instance == null ) { 
+			instance = new DBSettings(); 
+			readJSONFile();
+		}	
+		return instance;		
 	}		
 
 	public String getDB_URL() {
 		return DB_URL;
 	}
 
-	private void setDB_URL(String dB_URL) {
+	private static void setDB_URL(String dB_URL) {
 		DB_URL = dB_URL;
 	}
 	
@@ -40,7 +45,7 @@ public class DBSettings {
 		return DB_USER;
 	}
 
-	private void setDB_USER(String dB_USER) {
+	private static void setDB_USER(String dB_USER) {
 		DB_USER = dB_USER;
 	}
 
@@ -48,11 +53,11 @@ public class DBSettings {
 		return DB_PASS;
 	}
 
-	private void setDB_PASS(String dB_PASS) {
+	private static void setDB_PASS(String dB_PASS) {
 		DB_PASS = dB_PASS;
 	}	
 	
-	private void readJSONFile(){
+	private static void readJSONFile(){
 
         try { 
             Object obj = parser.parse(new FileReader(

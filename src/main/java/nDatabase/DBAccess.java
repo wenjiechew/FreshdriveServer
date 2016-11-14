@@ -14,7 +14,7 @@ import nUtillities.Logger;
  */
 public class DBAccess {
 	private static DBAccess instance;
-	private DBSettings setting = new DBSettings();
+	private DBSettings setting = DBSettings.getInstance();
 
 	
 	public static DBAccess getInstance() { 
@@ -28,7 +28,7 @@ public class DBAccess {
 		Logger.getInstance().PrintInfo("OpenDB ()", "Connecting to database..." );
 		
 		//Register JDBC
-		Class.forName(Constants.getJDBC_DRIVER());
+		Class.forName( Constants.JDBC_DRIVER );
 		
 		//Opening Connection		
 		connection = DriverManager.getConnection( setting.getDB_URL() , setting.getDB_USER(), setting.getDB_PASS());
@@ -43,14 +43,6 @@ public class DBAccess {
 		
 		Logger.getInstance().PrintInfo("Database is Closed");
 	}
-	
-	
-
-	
-	
-	
-
-	
 	
 	
 }

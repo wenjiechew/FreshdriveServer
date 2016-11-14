@@ -13,24 +13,29 @@ import org.json.simple.parser.JSONParser;
  *
  */
 public class DropboxSettings {
-	private JSONParser parser = new JSONParser();
-	private String AccessToken = null;
+	private static DropboxSettings instance;
 	
-	public DropboxSettings(){
-		readJSONFile();
+	private static JSONParser parser = new JSONParser();
+	private static String AccessToken = null;
+	
+	public static DropboxSettings getInstance(){
+		if( instance == null ) {
+			
+			instance = new DropboxSettings();
+			readJSONFile();			
+		}	
+		return instance;
 	}
 	
 	public String getAccessToken() {
 		return AccessToken;
 	}
 
-	public void setAccessToken(String accessToken) {
+	public static void setAccessToken(String accessToken) {
 		AccessToken = accessToken;
-	}
-
+	}	
 	
-	
-	private void readJSONFile(){
+	private static void readJSONFile(){
 
         try { 
             Object obj = parser.parse(new FileReader(

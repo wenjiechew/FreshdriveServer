@@ -13,7 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 import nConstants.AESConstants;
 
 public class AESCipher {
-	private static AESConstants aesConstants = new AESConstants();
+	private static AESConstants aesConstants = AESConstants.getInstance();
 	private static SecretKey key;
 	//TODO: Save the password somewhere else, maybe in a text file and retrieve it
 	private static char[] password = null;

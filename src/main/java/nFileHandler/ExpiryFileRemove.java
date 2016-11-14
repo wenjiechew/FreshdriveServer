@@ -15,68 +15,96 @@ import nDatabase.DBAccess;
 import nUtillities.AESCipher;
 import nUtillities.Logger;
 
-public class ExpiryFileRemove {
-	private static DropboxSettings dropboxSettings = new DropboxSettings();
-	
+/**
+ * This Class gathers the files from the "File" Table in the Database that are expired in the current date. Each iterations (depending the number of files expires)
+ * will Remove it's file permission list ( Records of sharing to users related to the file) from the "Permission" Table in the Database
+ * and Removes from the file server (Dropbox).
+ * 
+ * Finally Removing this list from the "File" Table in the Database.
+ *  
+ * @author WenJieChew
+ *
+ */
+public class ExpiryFileRemove {		
 	private static Connection connection;
-	private static PreparedStatement preparedStatement;
 	private static PreparedStatement findFileStatement;
-	
-	//Check File Dates to Delete
-		public static void checkFileExpire(){
-			String fileName = "";
-			DbxRequestConfig config = new DbxRequestConfig("FreshDrive", Locale.getDefault().toString());
-			System.out.println("Connect to dropbox");
-			DbxClient client;
-			client = new DbxClient(config, dropboxSettings.getAccessToken());
-			try{
-				connection = DBAccess.getInstance().openDB();
+		
+	private static DbxRequestConfig config = new DbxRequestConfig("FreshDrive", Locale.getDefault().toString());
+	private static DbxClient client = new DbxClient(config, DropboxSettings.getInstance().getAccessToken() );
+		
+	/**
+	 * Gather Expired Files (ID, Name, Path, IV, Salt) and decrypt Path to delete from Dropbox.
+	 * And Specific function mentioned below
+	 */
+	public static void deleteFileExpired(){
+		try{
+			connection = DBAccess.getInstance().openDB();
+			
+			//Find Files that are expired, that is before current date.
+			findFileStatement = connection.prepareStatement( Constants.SELECT_FileFields );		
+			ResultSet result = findFileStatement.executeQuery();
+			
+			
+			if(result.next()){				
 				
-				//Get All file_id of the Files that is before current dates
-				preparedStatement = connection.prepareStatement( Constants.getDELETE_FILEIDS() );
-				String findFileQuery = "SELECT file_name, file_path, file_iv, file_salt FROM files WHERE file_expireOn < current_date()";
-				findFileStatement = connection.prepareStatement(findFileQuery);
-				ResultSet rset = findFileStatement.executeQuery();
-				byte[] encryptedPath = null;
-				byte[] fileIv = null;
-				byte[] fileSalt = null;
-//				String[] fileQueryArray = null;
-				while(rset.next()){
-					fileName = rset.getString("file_name");
-					encryptedPath = rset.getBytes("file_path");
-					fileIv = rset.getBytes("file_iv");
-					fileSalt = rset.getBytes("file_salt");
-					System.out.println("Encrypted path: "+encryptedPath);
-					System.out.println("Encrypted IV: "+fileIv);
-					System.out.println("Encrypted Salt: "+fileSalt);
-//					System.out.println("Expire result set: " + rset.getString(1));
-					String decryptedString = AESCipher.DecryptString(encryptedPath, fileIv, fileSalt);
-					client.delete(decryptedString);
-				}
+				do{					
+					//Remove Related File From Sharing Permission List
+					deletePermissionOfFiles( result.getString( "file_ID") );
+					
+					//Delete this files from DropBox
+					client.delete( AESCipher.DecryptString( result.getBytes("file_path") , result.getBytes("file_iv") , result.getBytes("file_salt") ));
+					Logger.getInstance().PrintInfo( result.getString("file_name") + " is deleted");
+				}while (result.next());
 				
-//				System.out.println("decrypted string: "+ decryptedString);
-				int rowsDel = preparedStatement.executeUpdate();
-				
-				System.out.println("No. of rows Deleted: " + rowsDel + " at " + new java.util.Date());	
-				
-				//
-				// // access token for the dropbox account. may need to encrypt this
-//				String accessToken = "-TcOHePlr9AAAAAAAAAACMWGsYvDXPTDcThy6nM8r0hwG-Mz5cEqtDxcDygkg9i3";
-				//
-				
-				
-				
-				DBAccess.getInstance().closeDB();
-				
-				
-				
-				
-				
-			}catch(SQLException e){
-				Logger.getInstance().PrintError("openDB() ", e.toString());
-			}catch(Exception e){
-				Logger.getInstance().PrintError("openDB() ", e.toString());
+				//Remove Expired from List
+				deleteFromFileTable();					
+
+			}else {
+				Logger.getInstance().PrintInfo("There are no files Expire today");
 			}
+
+			connection.close();
+			
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			Logger.getInstance().PrintError("openDB() ", e.toString());
+		}catch(Exception e){
+			Logger.getInstance().PrintError("openDB() ", e.toString());		
 		}
+
+	}
+	
+	/**
+	 * Gets the specific file ID and deletes from the Permission table in the Database
+	 * @param fileID
+	 * @throws SQLException
+	 */	
+	private static void deletePermissionOfFiles(String fileID) throws SQLException {
+		findFileStatement = connection.prepareStatement( Constants.DELETE_FilePermission );
+		findFileStatement.setString(1, fileID);	
+		
+		int rowsDel = findFileStatement.executeUpdate();	
+		
+		Logger.getInstance().PrintInfo("Total of " + rowsDel + " permission related to fileID of " + fileID + " is being deleted" );
+	}
+	
+	/**
+	 * Deletes all the expired files as of today from the File table in the Database
+	 * @throws SQLException
+	 */
+	private static void deleteFromFileTable() throws SQLException{
+		findFileStatement = connection.prepareStatement( Constants.DELETE_FileIDs );
+		int rowsDel = findFileStatement.executeUpdate();
+		
+		Logger.getInstance().PrintInfo("Total of " + rowsDel + " files is being deleted" );
+	}
+	
+
+	
+	
+	
+	
+	
 
 }

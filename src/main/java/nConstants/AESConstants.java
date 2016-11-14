@@ -8,23 +8,32 @@ import org.json.simple.parser.JSONParser;
 
 
 public class AESConstants {
-	private JSONParser parser = new JSONParser();
+	private static AESConstants instance;
+	private static JSONParser parser = new JSONParser();
 	
 	private static String AESPass = null;
 	
-	public AESConstants(){
-		readJSONFile();
+	public static AESConstants getInstance(){
+		if(instance == null){
+			instance = new AESConstants();
+			readJSONFile();
+		}
+		return instance;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public String getAESPass() {
 		return AESPass;
 	}
 
-	private void setAESPass(String aESPass) {
+	private static void setAESPass(String aESPass) {
 		AESPass = aESPass;
 	}
 	
-	private void readJSONFile(){
+	private static void readJSONFile(){
 
         try { 
             Object obj = parser.parse(new FileReader(
