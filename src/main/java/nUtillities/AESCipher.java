@@ -13,7 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 import nConstants.AESConstants;
 
 public class AESCipher {
-	private static AESConstants aesConstants = new AESConstants();
+	private static AESConstants aesConstants = AESConstants.getInstance();
 	private static SecretKey key;
 	//TODO: Save the password somewhere else, maybe in a text file and retrieve it
 	private static char[] password = null;
@@ -49,7 +49,7 @@ public class AESCipher {
 	 This updates the restricted policies to unlimited policies to allow for a larger key size.
 	 
 	 "InvalidKeyException: Illegal Key Size" error may occur if not done.*/
-	public static String[] EncryptString (String filePath){
+	public static byte[][] EncryptString (String filePath){
 		try {
 			/*Generate a 8 byte SecureRandom salt*/
 			byte[] salt = generateSalt();
@@ -62,8 +62,8 @@ public class AESCipher {
 			System.out.println("[Information] " + filePath + " has been encrypted.");
 			System.out.println("[Information] IV: " + iv.toString());
 			System.out.println("[Information] Cipher: " + ciphertext.toString());
-			//TODO: Return salt, IV and encrypted string to save in database
-			String[] fileInfo = {ciphertext.toString(), iv.toString(), salt.toString()};
+			
+			byte[][] fileInfo = {ciphertext, iv, salt};
 			return fileInfo;
 		}
 		catch (Exception ex)

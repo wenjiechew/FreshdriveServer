@@ -75,6 +75,11 @@ public class SharingList extends HttpServlet {
 	    }
     }
 	
+	/**
+	 * Retrieve the username of a user
+	 * @param userID
+	 * @return username
+	 */
 	public static String getSharedUsernames(int userID){
 		String username = null;
 		try {
@@ -100,12 +105,18 @@ public class SharingList extends HttpServlet {
 		return username;
 	}
 
+	/**
+	 * Retrieve a list of users who has access to specific file
+	 * @param fileID
+	 * @return list of userIDs with access to file or null (unshared file)
+	 */
 	public static List<Integer> getSharingUsers(int fileID){
 		List<Integer> sharedUsers = new ArrayList<Integer>();
 		try {
 			connection = DBAccess.getInstance().openDB();
-			preparedStatement = connection.prepareStatement("SELECT permission_sharedToUserID FROM "
-					+ "permissions WHERE permission_fileID=?");
+			preparedStatement = connection.prepareStatement("SELECT p.permission_sharedToUserID FROM "
+					+ "permissions p JOIN files f ON p.permission_fileID = f.file_ID WHERE p.permission_fileID=? "
+					+ "AND p.permission_sharedToUserID != f.file_ownerID");
 			
 			preparedStatement.setInt(1, fileID);
 			ResultSet rs = preparedStatement.executeQuery();

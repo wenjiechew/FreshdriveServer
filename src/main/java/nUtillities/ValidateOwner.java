@@ -43,7 +43,6 @@ public class ValidateOwner extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("userID") + " AND " +  request.getParameter("fileID"));
 		
 		int fileID = Integer.parseInt(request.getParameter("fileID"));
@@ -56,6 +55,12 @@ public class ValidateOwner extends HttpServlet {
         out.print(validateOwnership(userID, fileID));
 	}
 	
+	/**
+	 * Validates if user is the owner of the specific file as only owners have rights to share files
+	 * @param userID
+	 * @param fileID
+	 * @return
+	 */
 	public boolean validateOwnership(int userID, int fileID){
 		int ownerID = 0;
 

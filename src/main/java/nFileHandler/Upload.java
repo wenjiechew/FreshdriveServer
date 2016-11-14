@@ -69,7 +69,7 @@ public class Upload extends HttpServlet {
 		System.out.println("File Path: " + filePath);
 		boolean fileExist;
 		try {
-			fileExist = checkIfFileExist(fileName, ownerId); //INSERT OWNER ID
+			fileExist = checkIfFileExist(fileName, ownerId); 
 			if (fileExist) {
 				// get the input from the client's output stream
 				ServletInputStream fileInputStream = request.getInputStream();
@@ -101,6 +101,8 @@ public class Upload extends HttpServlet {
 					out.println("File Failed");
 					e.printStackTrace();
 				}
+				response.setContentType("text/html");
+				out.println("File uploaded");
 			}else{
 				response.setContentType("text/html");
 				out.println("File already exist");
@@ -116,7 +118,7 @@ public class Upload extends HttpServlet {
 
 	private boolean checkIfFileExist(String fileName, String owner_id) throws Exception {
 		// TODO Auto-generated method stub
-		// true: yes, false: no
+		// true: don't exist, false: exist
 		int count = 0;
 		ResultSet rset = null;
 		try {
@@ -161,20 +163,24 @@ public class Upload extends HttpServlet {
 			} else {
 				expireDate = Date.valueOf(expireOn);
 			}
-			String[] encryptedFilePath = AESCipher.EncryptString(filePath);
+			byte[][] encryptedFilePath = AESCipher.EncryptString(filePath);
+			byte[] pathByte = encryptedFilePath[0];
+			byte[] ivByte = encryptedFilePath[1];
+			byte[] saltByte = encryptedFilePath[2];
+			
 			connection = DBAccess.getInstance().openDB();
 			// Get password for selected user account based on given username
 			preparedStatement = connection.prepareStatement(
 					"INSERT INTO files (file_name, file_path, file_size, file_createdOn, file_ownerID, file_expireOn, file_salt, file_iv) "
 							+ "VALUES (?,?,?,?,?,?,?,?)");
 			preparedStatement.setString(1, fileName);
-			preparedStatement.setString(2, encryptedFilePath[0]);
+			preparedStatement.setBytes(2, pathByte);
 			preparedStatement.setString(3, Long.toString(fileLength));
 			preparedStatement.setString(4, createdOn);
 			preparedStatement.setString(5, owner_id);
 			preparedStatement.setDate(6, expireDate);
-			preparedStatement.setString(7, encryptedFilePath[1]);
-			preparedStatement.setString(8, encryptedFilePath[2]);
+			preparedStatement.setBytes(7, saltByte);
+			preparedStatement.setBytes(8, ivByte);
 			preparedStatement.executeUpdate();
 			DBAccess.getInstance().closeDB();
 			insertIntoPermissions(fileName, owner_id);
@@ -192,15 +198,15 @@ public class Upload extends HttpServlet {
 		connection = DBAccess.getInstance().openDB();
 		// Get password for selected user account based on given username
 		preparedStatement = connection.prepareStatement("INSERT INTO permissions (permission_fileID, permission_sharedToUserID)"
-														+ "VALUES((SELECT file_ID FROM files WHERE file_name = '"+fileName+"'), '"+ownerId+"' )");
+														+ "VALUES((SELECT file_ID FROM files WHERE file_name = '"+fileName+"' AND file_ownerID = '"+ownerId+"'), '"+ownerId+"' )");
 		preparedStatement.executeUpdate();
 		DBAccess.getInstance().closeDB();
 		
 															
 		}catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
+			Logger.getInstance().PrintError("Insert into permission sql error", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
+			Logger.getInstance().PrintError("Insert into permission exception error", e.toString());
 		}
 	}
 

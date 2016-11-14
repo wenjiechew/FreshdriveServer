@@ -74,8 +74,8 @@ public class Retrieve extends HttpServlet {
 			
 			obj.add("fileNames", array);
 //			System.out.println("json array pos 2"+array.get(2).toString());
-			System.out.println("GSON to JSON: "+ gson.toJson(array));
-			System.out.println("GSON to JSON: "+ gson.toJson(obj));
+//			System.out.println("GSON to JSON: "+ gson.toJson(array));
+//			System.out.println("GSON to JSON: "+ gson.toJson(obj));
 			
 		} catch (SQLException e) {
 			Logger.getInstance().PrintError("openDB() ", e.toString());
