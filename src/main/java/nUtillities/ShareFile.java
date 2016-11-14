@@ -149,7 +149,9 @@ public class ShareFile extends HttpServlet {
 				}
 			}
 			
-			DBAccess.getInstance().closeDB();
+			preparedStatement.close();
+			connection.close();
+			
 			return 1;
 		} catch (Exception e) {
 			Logger.getInstance().PrintError("shareFile() ", e.toString());
@@ -187,7 +189,10 @@ public class ShareFile extends HttpServlet {
 				userInfo = null;
 			}
 			
-			DBAccess.getInstance().closeDB();
+			rs.close();
+			preparedStatement.close();
+			connection.close();
+			
 		} catch (Exception e) {
 			System.out.println("validateUser(): " + e.toString());
 			Logger.getInstance().PrintError("validateUser() ", e.toString());
@@ -223,7 +228,10 @@ public class ShareFile extends HttpServlet {
 				valid = false;
 			}
 			
-			DBAccess.getInstance().closeDB();
+			rs.close();
+			preparedStatement.close();
+			connection.close();
+			
 		} catch (Exception e) {
 			System.out.println("validateFile(): " + e.toString());
 			Logger.getInstance().PrintError("validateFile() ", e.toString());
@@ -255,7 +263,10 @@ public class ShareFile extends HttpServlet {
 				Logger.getInstance().PrintInfo("validateUserPermission()", fileID + " is not shared to " + userID);
 			}
 			
-			DBAccess.getInstance().closeDB();
+			rs.close();
+			preparedStatement.close();
+			connection.close();
+			
 		} catch (Exception e) {
 			Logger.getInstance().PrintError("validateUserPermission() ", e.toString());
 		}
@@ -286,7 +297,8 @@ public class ShareFile extends HttpServlet {
 				Logger.getInstance().PrintInfo("removeUserPermission()", fileID + "'s access to " + userID + " is not found.");
 			}
 			
-			DBAccess.getInstance().closeDB();
+			preparedStatement.close();
+			connection.close();
 		} catch (Exception e) {
 			Logger.getInstance().PrintError("removeUserPermission() ", e.toString());
 		}
