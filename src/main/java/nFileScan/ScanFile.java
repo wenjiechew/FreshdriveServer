@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import nConstants.ScanSettings;
 import nLogin.Validate;
+import nUtillities.Log;
 import nUtillities.Logger;
 
 /**
@@ -22,6 +23,7 @@ import nUtillities.Logger;
 public class ScanFile extends HttpServlet {
 	private static ScanSettings scanSettings = ScanSettings.getInstance();
 	private static final long serialVersionUID = 1L;
+	private static Log Log = new Log();
        
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
@@ -33,8 +35,8 @@ public class ScanFile extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		if(Validate.verifyToken(
 				request.getParameter("user_token"), request.getParameter("username")) == 1){			
-			
 			out.println( scanSettings.getScanKey() );
+			Log.log("Scan File Process|"+ request.getParameter("username") + " submited a file to scan");
 		}else {
 			out.println("1");
 		}

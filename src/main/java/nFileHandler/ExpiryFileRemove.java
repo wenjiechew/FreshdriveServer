@@ -13,6 +13,7 @@ import nConstants.Constants;
 import nConstants.DropboxSettings;
 import nDatabase.DBAccess;
 import nUtillities.AESCipher;
+import nUtillities.Log;
 import nUtillities.Logger;
 
 /**
@@ -28,6 +29,7 @@ import nUtillities.Logger;
 public class ExpiryFileRemove {		
 	private static Connection connection;
 	private static PreparedStatement findFileStatement;
+	private static Log Log = new Log();
 		
 	private static DbxRequestConfig config = new DbxRequestConfig("FreshDrive", Locale.getDefault().toString());
 	private static DbxClient client = new DbxClient(config, DropboxSettings.getInstance().getAccessToken() );
@@ -54,6 +56,7 @@ public class ExpiryFileRemove {
 					//Delete this files from DropBox
 					client.delete( AESCipher.DecryptString( result.getBytes("file_path") , result.getBytes("file_iv") , result.getBytes("file_salt") ));
 					Logger.getInstance().PrintInfo( result.getString("file_name") + " is deleted" );
+					Log.log("Expiry Process|"+ result.getString("file_name") + " is deleted");
 				}while (result.next());
 				
 				//Remove Expired from List

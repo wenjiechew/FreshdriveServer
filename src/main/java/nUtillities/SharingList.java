@@ -24,6 +24,7 @@ public class SharingList extends HttpServlet {
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
 	private static final long serialVersionUID = 1L;
+	private static Log Log = new Log();
        
     /**
      * @see HttpServlet#HttpServlet()

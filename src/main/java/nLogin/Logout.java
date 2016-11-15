@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import nUtillities.Log;
 import nUtillities.Logger;
 
 /**
@@ -17,6 +18,7 @@ import nUtillities.Logger;
 @WebServlet("/Logout")
 public class Logout extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static Log Log = new Log();
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -28,6 +30,7 @@ public class Logout extends HttpServlet {
         if(Validate.clearTokenOnLogout(request.getParameter("username"))>0){
             Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Logout");
             out.println("logged-out");
+            Log.log("Logout Process|"+ request.getParameter("username") + " logged out");
         }
         else {
             Logger.getInstance().PrintInfo("Account : is NOT Logout");

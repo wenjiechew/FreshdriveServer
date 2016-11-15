@@ -75,10 +75,11 @@ public class Login extends HttpServlet {
 				// Active token existing; someone is currently logged in with
 				// the account
 				out.println("active-token");
+				Log.log("Login Process|"+ account.getUsername() + " is already logged in");
 			} else {
 				Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Validate");
 				Logger.getInstance().PrintInfo("User name: " + account.getUsername());
-				Log.log("Login Sucessful");
+				Log.log("Login Process|"+ account.getUsername() + " password matched");
 				try {
 					account.setEmail(getEmail(account.getUsername()));
 					sendEmail(account);

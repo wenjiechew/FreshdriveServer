@@ -21,6 +21,7 @@ import com.dropbox.core.*;
 
 import nDatabase.DBAccess;
 import nUtillities.AESCipher;
+import nUtillities.Log;
 import nUtillities.Logger;
 
 /**
@@ -33,6 +34,7 @@ public class Upload extends HttpServlet {
 	PreparedStatement permissionStatement;
 	private static final long serialVersionUID = 1L;
 	static final int BUFFER_SIZE = 524288000;
+	private static Log Log = new Log();
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
@@ -88,6 +90,7 @@ public class Upload extends HttpServlet {
 					DbxEntry.File uploadedFile = client.uploadFile("/" + username + "/" + inputFile.getName(),
 							DbxWriteMode.add(), fileLength, fileInputStream);
 					System.out.println("Uploaded: " + uploadedFile.toString());
+					Log.log("Upload Process|"+ username + " uploaded file '" + uploadedFile.toString() + "'");
 					response.setContentType("text/html");
 					out.println("File Uploaded");
 					//TODO if fail, rollback (i.e. delete) created file record inside database 

@@ -20,6 +20,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import nDatabase.DBAccess;
+import nUtillities.Log;
 import nUtillities.Logger;
 
 /**

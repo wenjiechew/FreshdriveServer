@@ -25,6 +25,7 @@ public class ShareFile extends HttpServlet {
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
 	private static final long serialVersionUID = 1L;
+	private static Log Log = new Log();
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("users")+ ", " + request.getParameter("fileID")+ ", " + request.getParameter("action"));

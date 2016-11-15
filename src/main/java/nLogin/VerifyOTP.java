@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import nDatabase.DBAccess;
+import nUtillities.Log;
 import nUtillities.Logger;
 
 /**
@@ -27,6 +28,7 @@ public class VerifyOTP extends HttpServlet {
 	private SecureRandom sr = new SecureRandom();
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
+	private static Log Log = new Log();
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -49,6 +51,7 @@ public class VerifyOTP extends HttpServlet {
 				// in the format of id+username+email+token
 				String userInfo = getUserInformation(username);
 				out.println(userInfo);
+				Log.log("Login Process|"+ userInfo + " OTP accepted");
 			}
         }
         else if(Validate.verifyOTP(username, otp)==-1){
