@@ -24,7 +24,9 @@ public class Constants {
 	public static String INSERT_FilePermission = "INSERT INTO permissions (permission_fileID, permission_sharedToUserID)"
 			+ "VALUES((SELECT file_ID FROM files WHERE file_name = ? AND file_ownerID = ?), ? )";
 	
-	
+	//File Retrieve
+	public static String SELECT_FileRelatedtoID = "SELECT file_name, file_ID from files WHERE file_ID IN "
+			+ "(SELECT permission_fileID from permissions where permission_sharedToUserID = ?)";
 	
 	public static void setCurrentPath(String currentPath) {
 		Constants.currentPath = currentPath;
