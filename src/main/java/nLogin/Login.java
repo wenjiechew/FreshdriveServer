@@ -14,7 +14,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.MessagingException;
-
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -206,4 +207,13 @@ public class Login extends HttpServlet {
 		}
 		return otp;
 	}
+	
+	/**
+     * @see ServletContextListener#contextDestroyed(ServletContextEvent)
+     */
+    public void contextDestroyed(ServletContextEvent sce)  { 
+        //Destroy all created threads, if any
+    	if(executorService!=null)
+    		executorService.shutdown();
+    }
 }
