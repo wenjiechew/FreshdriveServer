@@ -6,10 +6,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Locale;
 
 import javax.servlet.ServletException;
@@ -58,7 +62,7 @@ public class Download extends HttpServlet {
 				
 		int fileID = Integer.parseInt(request.getParameter("fileID"));
 		String fileName = "";
-		
+		File file = null;;
 	     
 		try{
 			connection = DBAccess.getInstance().openDB();
@@ -91,20 +95,35 @@ public class Download extends HttpServlet {
 			System.out.println("Connect to dropbox");
 			DbxClient client;
 			client = new DbxClient(config, accessToken);
-//			client.delete("/test/clone.txt");
-			String home = System.getProperty("user.home");
-//			File file = new File(home+"/Downloads/" + fileName);
-			FileOutputStream outputStream = new FileOutputStream(home+"/Downloads/" + fileName);
-	        try {
+
+ //			Set output stream to download file to
+ 			FileOutputStream outputStream = new FileOutputStream(fileName);
+			  	        
+			
+			try {
 	            DbxEntry.File downloadedFile = client.getFile(decryptedString, null,
 	                outputStream);
 	            System.out.println("Metadata: " + downloadedFile.toString());
-	        } finally {
+	          //input downloadedfile into a new file
+                file = new File(fileName);
+	            System.out.println(file.getName());
+	            
+	            Path path = Paths.get(file.getAbsolutePath());
+	          //parse file into bytes 
+	            byte[] data = Files.readAllBytes(path);
+	            //send the bytes to the client
+	            out.println(Arrays.toString(data));
+			
+			
+			} finally {
 	            outputStream.close();
+	            if(file.exists()){
+	            	file.delete();
+ 	            }
 	        }
 			
-			out.println("File has been downloaded");
-			Log.log("Download Process|"+ home + " downloaded file '" + fileName + "'");
+//			out.println("File has been downloaded");
+//			Log.log("Download Process|"+ home + " downloaded file '" + fileName + "'");
 		}catch (SQLException e) {
 			Logger.getInstance().PrintError("download sql() ", e.toString());
 			out.println("Download Fail");
