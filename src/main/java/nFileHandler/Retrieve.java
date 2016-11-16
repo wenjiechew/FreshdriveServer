@@ -19,8 +19,6 @@ import com.google.gson.JsonObject;
 
 import nConstants.Constants;
 import nDatabase.DBAccess;
-import nUtillities.Log;
-import nUtillities.Logger;
 
 /**
  * This servlet allows POST, to retrieve the FileIDs and FileName related to the user logged ID 
@@ -70,9 +68,7 @@ public class Retrieve extends HttpServlet {
 			preparedStatement.close();
 			connection.close();
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		}
 		
 		out.print(gson.toJson(obj));

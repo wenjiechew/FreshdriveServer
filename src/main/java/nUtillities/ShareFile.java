@@ -26,11 +26,13 @@ public class ShareFile extends HttpServlet {
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
 	private static final long serialVersionUID = 1L;
+	private static String CurrentUsername ;
 	private static Log Log = new Log();
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("users")+ ", " + request.getParameter("fileID")+ ", " + request.getParameter("action"));
+		Log.log("User Response POST === " + request.getParameter("users")+ ", " + request.getParameter("fileID")+ ", " + request.getParameter("action"));
 		
+		CurrentUsername = request.getParameter("users");
 		int fileID = Integer.parseInt(request.getParameter("fileID"));
 		String action = request.getParameter("action");
 		String users = request.getParameter("users");
@@ -149,7 +151,6 @@ public class ShareFile extends HttpServlet {
 				int rs = preparedStatement.executeUpdate();
 				
 				if (rs == 1){
-					Logger.getInstance().PrintInfo("shareFile()", fileID + " shared to " + users.get(i));
 				}
 				else
 				{
@@ -162,7 +163,6 @@ public class ShareFile extends HttpServlet {
 			
 			return 1;
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("shareFile() ", e.toString());
 		}
 		return 0;
 	}
@@ -186,14 +186,12 @@ public class ShareFile extends HttpServlet {
 			
 			if(rs.next()){
 				System.out.println("validateUser(): " + user + " is validated");
-				Logger.getInstance().PrintInfo("validateUser(): " + user + " is validated");
 				userInfo[0] = rs.getString("user_ID");
 				userInfo[1] = rs.getString("username");
 			}
 			else
 			{
 				System.out.println("validateUser(): " + user + " is not validated");
-				Logger.getInstance().PrintInfo("validateUser(): " + user + " is not validated");
 				userInfo = null;
 			}
 			
@@ -203,7 +201,6 @@ public class ShareFile extends HttpServlet {
 			
 		} catch (Exception e) {
 			System.out.println("validateUser(): " + e.toString());
-			Logger.getInstance().PrintError("validateUser() ", e.toString());
 		}
 		return userInfo;
 	}
@@ -226,13 +223,11 @@ public class ShareFile extends HttpServlet {
 			
 			if(rs.next()){
 				System.out.println("validateFile(): File is validated");
-				Logger.getInstance().PrintInfo("validateFile(): File is validated");
 				valid = true;
 			}
 			else
 			{
 				System.out.println("validateFile(): File is not validated");
-				Logger.getInstance().PrintInfo("validateFile(): File is not validated");
 				valid = false;
 			}
 			
@@ -242,7 +237,6 @@ public class ShareFile extends HttpServlet {
 			
 		} catch (Exception e) {
 			System.out.println("validateFile(): " + e.toString());
-			Logger.getInstance().PrintError("validateFile() ", e.toString());
 		}
 		return valid;
 	}
@@ -264,11 +258,11 @@ public class ShareFile extends HttpServlet {
 			ResultSet rs = preparedStatement.executeQuery();
 			
 			if(rs.next()){
-				Logger.getInstance().PrintInfo("validateUserPermission()", fileID + " is shared to " + userID);
+				Log.log("ShareFile Process| "+ CurrentUsername + "'s "+ fileID + " is shared to " + userID);
 				return 1;
 			}
 			else {
-				Logger.getInstance().PrintInfo("validateUserPermission()", fileID + " is not shared to " + userID);
+				Log.warn("ShareFile Process| "+ CurrentUsername + "'s "+ fileID + " is not shared to " + userID);
 			}
 			
 			rs.close();
@@ -276,7 +270,7 @@ public class ShareFile extends HttpServlet {
 			connection.close();
 			
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("validateUserPermission() ", e.toString());
+			
 		}
 		return 0;
 	}
@@ -298,17 +292,14 @@ public class ShareFile extends HttpServlet {
 			int rs = preparedStatement.executeUpdate();
 			
 			if(rs == 1){
-				Logger.getInstance().PrintInfo("removeUserPermission()", fileID + " is no longer shared to " + userID);
 				return 1;
 			}
 			else {
-				Logger.getInstance().PrintInfo("removeUserPermission()", fileID + "'s access to " + userID + " is not found.");
 			}
 			
 			preparedStatement.close();
 			connection.close();
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("removeUserPermission() ", e.toString());
 		}
 		return 0;
 	}

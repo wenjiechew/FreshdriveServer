@@ -14,7 +14,6 @@ import nConstants.DropboxSettings;
 import nDatabase.DBAccess;
 import nUtillities.AESCipher;
 import nUtillities.Log;
-import nUtillities.Logger;
 
 /**
  * This Class gathers the files from the "File" Table in the Database that are expired in the current date. Each iterations (depending the number of files expires)
@@ -55,7 +54,7 @@ public class ExpiryFileRemove {
 					
 					//Delete this files from DropBox
 					client.delete( AESCipher.DecryptString( result.getBytes("file_path") , result.getBytes("file_iv") , result.getBytes("file_salt") ));
-					Logger.getInstance().PrintInfo( result.getString("file_name") + " is deleted" );
+//					Logger.getInstance().PrintInfo( result.getString("file_name") + " is deleted" );
 					Log.log("Expiry Process|"+ result.getString("file_name") + " is deleted");
 				}while (result.next());
 				
@@ -63,21 +62,18 @@ public class ExpiryFileRemove {
 				deleteFromFileTable();					
 
 			}else {
-				Logger.getInstance().PrintInfo("There are no files Expire today");
+				Log.log("Expiry Process| 0 files expired today");
 			}
 
 			result.close();
 			findFileStatement.close();
 			connection.close();
-			Logger.getInstance().PrintInfo("Database is Closed");
 			
 			
 			
 		}catch(SQLException e){
 			e.printStackTrace();
-			Logger.getInstance().PrintError("openDB() ", e.toString());
-		}catch(Exception e){
-			Logger.getInstance().PrintError("openDB() ", e.toString());		
+		}catch(Exception e){	
 		}
 
 	}
@@ -92,8 +88,7 @@ public class ExpiryFileRemove {
 		findFileStatement.setString(1, fileID);	
 		
 		int rowsDel = findFileStatement.executeUpdate();	
-		
-		Logger.getInstance().PrintInfo("Total of " + rowsDel + " permission related to fileID of " + fileID + " is being deleted" );
+		Log.log("Expiry Process| Total of " + rowsDel + " permission related to fileID of " + fileID + " is being deleted" );
 	}
 	
 	/**
@@ -104,7 +99,7 @@ public class ExpiryFileRemove {
 		findFileStatement = connection.prepareStatement( Constants.DELETE_FileIDs );
 		int rowsDel = findFileStatement.executeUpdate();
 		
-		Logger.getInstance().PrintInfo("Total of " + rowsDel + " files is being deleted at " + new java.util.Date() );
+		Log.log("Expiry Process| Total of " + rowsDel + " files is being deleted at " + new java.util.Date() );
 	}
 	
 

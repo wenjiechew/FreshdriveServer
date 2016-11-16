@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import nUtillities.Log;
-import nUtillities.Logger;
 
 /**
  * Servlet implementation class Logout
@@ -28,13 +27,10 @@ public class Logout extends HttpServlet {
         PrintWriter out = response.getWriter();
 		response.setContentType("text/html" );
         if(Validate.clearTokenOnLogout(request.getParameter("username"))>0){
-            Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Logout");
-            out.println("logged-out");
             Log.log("Logout Process|"+ request.getParameter("username") + " logged out");
         }
         else {
-            Logger.getInstance().PrintInfo("Account : is NOT Logout");
-			out.println("1");
+          out.println("1");
         }
 	}
 }

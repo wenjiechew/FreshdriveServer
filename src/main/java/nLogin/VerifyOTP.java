@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import nDatabase.DBAccess;
 import nUtillities.Log;
-import nUtillities.Logger;
 
 /**
  * Servlet implementation class VerifyOTP
@@ -82,9 +81,7 @@ public class VerifyOTP extends HttpServlet {
 			preparedStatement.close();
 			connection.close();
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		}
 		return info;
 	}

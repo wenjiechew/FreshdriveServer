@@ -9,7 +9,6 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import nDatabase.DBAccess;
 import nObjectModel.Account;
-import nUtillities.Logger;
 
 public class Validate {
 	private static Connection connection;
@@ -17,7 +16,6 @@ public class Validate {
 
 	public static boolean checkUser(Account account) {
 		String password = account.getPassword();
-		Logger.getInstance().PrintInfo("CheckUser()", "Checking User " + account.getUsername() + " PW: " + password);
 		boolean valid = false;
 		try {
 			connection = DBAccess.getInstance().openDB();
@@ -37,9 +35,7 @@ public class Validate {
 			DBAccess.getInstance().closeDB();
 			
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		}
 
 		return valid;
@@ -61,9 +57,7 @@ public class Validate {
 			preparedStatement.close();
 			connection.close();
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		}
 		return rs;
 	}
@@ -82,9 +76,7 @@ public class Validate {
 			preparedStatement.close();
 			connection.close();
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		}
 		return rs;
 	}
@@ -102,9 +94,7 @@ public class Validate {
 			preparedStatement.close();
 			connection.close();
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("clearTokenOnLogout SQL ex ", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("clearTokenOnLogout ex ", e.toString());
 		}
 		return done;
 	}
@@ -130,9 +120,7 @@ public class Validate {
 			preparedStatement.close();
 			connection.close();
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("VerifyOTP SQL ex ", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("VerifyOTP SQL ex ", e.toString());
 		}
 		return 0;
 	}
@@ -155,9 +143,7 @@ public class Validate {
 			preparedStatement.close();
 			connection.close();
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("VerifyToken SQL exception ", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("VerifyToken exception ", e.toString());
 		}
 		return rsCount;
 	}

@@ -25,7 +25,8 @@ import nDatabase.DBAccess;
 import nLogin.Validate;
 import nObjectModel.FileModel;
 import nUtillities.AESCipher;
-import nUtillities.Logger;
+import nUtillities.Log;
+
 
 /**
  * This Serlvet only allow POST, from the client, Which first validates the right user before executing the main task. @return unverified-token 
@@ -89,7 +90,6 @@ public class Upload extends HttpServlet {
 					//Do upload to Dropbox
 					DbxEntry.File uploadedFile = client.uploadFile("/" + fileModel.getUserName() + "/" + inputFile.getName(),
 													DbxWriteMode.add(), Long.parseLong( fileModel.getFileLength() ), fileInputStream);
-					Logger.getInstance().PrintInfo("Uploaded: " + uploadedFile.toString() + " into Dropbox");
 					//Update File Table in Database
 					//Check if update done isDone = true
 					if(addFileToDatabase(fileModel)){
@@ -99,7 +99,6 @@ public class Upload extends HttpServlet {
 						
 					}else{
 						client.delete( AESCipher.DecryptString(fileModel.getPathByte(), fileModel.getIvByte(), fileModel.getSaltByte()));
-						Logger.getInstance().PrintError(getServletName(), "Unable to Update File Table in Database");
 					}
 					
 					out.println("File Uploaded");
@@ -112,12 +111,9 @@ public class Upload extends HttpServlet {
 				preparedStatement.close();
 				connection.close();	
 			}catch (SQLException e) {
-				Logger.getInstance().PrintError("openDB() ", e.toString());
-			} catch (Exception e) {
-				Logger.getInstance().PrintError("openDB() ", e.toString());
-			}			
+				} catch (Exception e) {
+				}			
 		}else{
-			Logger.getInstance().PrintInfo("Unable to Validate User");
 			//TODO Change Return ERROR
 			out.println("unverified-token");
 		}			
@@ -184,8 +180,5 @@ public class Upload extends HttpServlet {
 		preparedStatement.setString(2, fileModel.getOwnderID());
 		preparedStatement.setString(3, fileModel.getOwnderID());
 		preparedStatement.executeUpdate();
-
-		
-		
 	}
 }
