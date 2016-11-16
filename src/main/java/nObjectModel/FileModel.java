@@ -3,12 +3,14 @@ package nObjectModel;
 import java.sql.Date;
 
 public class FileModel {
+	private int fileID;
 	private String fileName = null;
 	private String username = null;
 	private String fileLength = null;
 	private String ownderID = null;
 	private String createdOn = null;
 	private Date expiredDate = null;
+	private String filePath = null;
 	private byte[] pathByte;
 	private byte[] ivByte;
 	private byte[] saltByte;
@@ -66,6 +68,18 @@ public class FileModel {
 	}
 	public void setExpiredDate(Date expiredDate) {
 		this.expiredDate = expiredDate;
+	}
+	public String getFilePath() {
+		return filePath;
+	}
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+	public int getFileID() {
+		return fileID;
+	}
+	public void setFileID(int fileID) {
+		this.fileID = fileID;
 	}
 	
 }
