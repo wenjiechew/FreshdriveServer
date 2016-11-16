@@ -77,7 +77,6 @@ public class Upload extends HttpServlet {
 		
 		//user-token AND username Validation
 		if (Validate.verifyToken( request.getHeader("usertoken"), fileModel.getUserName() ) == 1){
-			
 			//Check File Exist in the Database/FileServer ( true = Exist // false = not exist )
 			//if Not Exit Do Upload
 			try{
