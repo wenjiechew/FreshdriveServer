@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.dropbox.core.*;
 
 import nDatabase.DBAccess;
+import nLogin.Validate;
 import nUtillities.AESCipher;
 import nUtillities.Logger;
 
@@ -61,57 +62,67 @@ public class Upload extends HttpServlet {
 		// get the filelength from the client side also
 		Long fileLength = Long.parseLong(request.getHeader("fileLength"));
 		String username = request.getHeader("username");
-		 String ownerId = request.getHeader("ownerID");
+		String token = request.getHeader("usertoken");
+		String ownerId = request.getHeader("ownerID");
 		String createdOn = request.getHeader("createdOn");
 		String expireDate = request.getHeader("expiryDate");
 		String fileName = request.getHeader("fileName");
 		File inputFile = new File(filePath);
 		System.out.println("File Path: " + filePath);
 		boolean fileExist;
-		try {
-			fileExist = checkIfFileExist(fileName, ownerId); 
-			if (fileExist) {
-				// get the input from the client's output stream
-				ServletInputStream fileInputStream = request.getInputStream();
-				//
-				//
-				System.out.println("Receiving data...");
-
-				// Try uploading to dropbox
-				System.out.println("Try uploading");
-				// System.out.println(inputStream.available());
-				try {
-					boolean dbSuccess = addFileToDb(fileName, filePath, fileLength, createdOn, ownerId, expireDate);	//INSERT OWNER ID
-					//if successfully added to database then upload file to dropbox
-					if(dbSuccess){
-					// writing the file into the dropbox
-					DbxEntry.File uploadedFile = client.uploadFile("/" + username + "/" + inputFile.getName(),
-							DbxWriteMode.add(), fileLength, fileInputStream);
-					System.out.println("Uploaded: " + uploadedFile.toString());
-					response.setContentType("text/html");
-					out.println("File Uploaded");
-					//TODO if fail, rollback (i.e. delete) created file record inside database 
-					
-					// client.delete("/test (2).txt");
-
+		
+		//Verify user's token first
+		if(Validate.verifyToken(token,username)==1){
+			try {
+				fileExist = checkIfFileExist(fileName, ownerId); 
+				if (fileExist) {
+					// get the input from the client's output stream
+					ServletInputStream fileInputStream = request.getInputStream();
+					//
+					//
+					System.out.println("Receiving data...");
+	
+					// Try uploading to dropbox
+					System.out.println("Try uploading");
+					// System.out.println(inputStream.available());
+					try {
+						boolean dbSuccess = addFileToDb(fileName, filePath, fileLength, createdOn, ownerId, expireDate);	//INSERT OWNER ID
+						//if successfully added to database then upload file to dropbox
+						if(dbSuccess){
+						// writing the file into the dropbox
+						DbxEntry.File uploadedFile = client.uploadFile("/" + username + "/" + inputFile.getName(),
+								DbxWriteMode.add(), fileLength, fileInputStream);
+						System.out.println("Uploaded: " + uploadedFile.toString());
+						response.setContentType("text/html");
+						out.println("File Uploaded");
+						//TODO if fail, rollback (i.e. delete) created file record inside database 
+						
+						// client.delete("/test (2).txt");
+	
+						}
+	
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						out.println("File Failed");
+						e.printStackTrace();
 					}
-
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					out.println("File Failed");
-					e.printStackTrace();
+					response.setContentType("text/html");
+					out.println("File uploaded");
+				}else{
+					response.setContentType("text/html");
+					out.println("File already exist");
 				}
-				response.setContentType("text/html");
-				out.println("File uploaded");
-			}else{
-				response.setContentType("text/html");
-				out.println("File already exist");
-			}
+					
 				
-			
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		else{
+			//Invalid user token
+			response.setContentType("text/html");
+			out.println("unverified-token");
 		}
 
 	}
