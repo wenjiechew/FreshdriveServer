@@ -131,7 +131,6 @@ public class Download extends HttpServlet {
 			fileModel.setSaltByte( rs.getBytes("file_salt") );
 			isDone = 1;
 		}else{
-			Logger.getInstance().PrintInfo("No Such File in Database");
 			out.println("No Such File in Database");
 			isDone = 1;
 		}
@@ -139,6 +138,7 @@ public class Download extends HttpServlet {
 			return true;
 		}else{
 			return false;
+
 		}
 	}
 

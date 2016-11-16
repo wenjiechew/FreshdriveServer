@@ -28,6 +28,7 @@ public class Logout extends HttpServlet {
 		response.setContentType("text/html" );
         if(Validate.clearTokenOnLogout(request.getParameter("username"))>0){
             Log.log("Logout Process|"+ request.getParameter("username") + " logged out");
+            out.println("logged-out");
         }
         else {
           out.println("1");

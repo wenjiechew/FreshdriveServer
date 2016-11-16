@@ -40,6 +40,7 @@ public class Upload extends HttpServlet {
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
 	private static ResultSet rs;
+	private static Log Log;
 	
 	private static final long serialVersionUID = 1L;	
 	
@@ -102,7 +103,7 @@ public class Upload extends HttpServlet {
 					}
 					
 					out.println("File Uploaded");
-					
+					Log.log("Upload Process| " + request.getHeader("username") + "uploaded "+ request.getHeader("filename"));
 				}else{
 					out.println("File already exist");
 				}
