@@ -4,10 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,18 +18,23 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.JFileChooser;
+
 
 import com.dropbox.core.DbxClient;
 import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxRequestConfig;
 
+import nConstants.Constants;
 import nConstants.DropboxSettings;
 import nDatabase.DBAccess;
+import nLogin.Validate;
+import nObjectModel.FileModel;
 import nUtillities.AESCipher;
 import nUtillities.Log;
 
 /**
+ * This class file, checks the user validity, if good it will download the path file the related fileID POST from the 'file' Table in the Database
+ * and decrpyt the path stored in Database, to download form dropbox
  * Servlet implementation class Download
  */
 @WebServlet("/Download")
@@ -40,85 +42,68 @@ public class Download extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
+	private static ResultSet rs;
+	private static PrintWriter out;
+	private static File file;
 	private static Log Log = new Log();
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public Download() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
-
+	private static DbxRequestConfig config = new DbxRequestConfig("FreshDrive", Locale.getDefault().toString());
+	private static DbxClient client = new DbxClient(config, DropboxSettings.getInstance().getAccessToken() );
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		PrintWriter out = response.getWriter();
-		System.out.println("download servlet called");
 		response.setContentType("text/html");
-				
-		int fileID = Integer.parseInt(request.getParameter("fileID"));
-		String fileName = "";
-		File file = null;;
-	     
-		try{
-			connection = DBAccess.getInstance().openDB();
-			// Get password for selected user account based on given username
-			preparedStatement = connection.prepareStatement("SELECT file_path, file_salt, file_iv, file_name FROM files WHERE file_ID = ?");
-			preparedStatement.setInt(1, fileID);
-			ResultSet rset = preparedStatement.executeQuery();
-			byte[] encryptedPath = null;
-			byte[] fileIv = null;
-			byte[] fileSalt = null;
-			while(rset.next()){
-				fileName = rset.getString("file_name");
-				encryptedPath = rset.getBytes("file_path");
-				fileIv = rset.getBytes("file_iv");
-				fileSalt = rset.getBytes("file_salt");
-				System.out.println("Encrypted path: "+encryptedPath);
-				System.out.println("Encrypted IV: "+fileIv);
-				System.out.println("Encrypted Salt: "+fileSalt);
-			}
-			
-			String decryptedString = AESCipher.DecryptString(encryptedPath, fileIv, fileSalt);
-			System.out.println("decrypted string: "+ decryptedString);
-			
-			DbxRequestConfig config = new DbxRequestConfig("FreshDrive", Locale.getDefault().toString());
-			//
-			// // access token for the dropbox account. may need to encrypt this
-			String accessToken = "-TcOHePlr9AAAAAAAAAACMWGsYvDXPTDcThy6nM8r0hwG-Mz5cEqtDxcDygkg9i3";
-			
-			//
-			System.out.println("Connect to dropbox");
-			DbxClient client;
-			client = new DbxClient(config, accessToken);
+		out = response.getWriter();		
 
- //			Set output stream to download file to
- 			FileOutputStream outputStream = new FileOutputStream(fileName);
-			  	        
+		//Check User Validity
+		if(Validate.verifyToken(request.getParameter("usertoken")  , request.getParameter("username")) == 1 ){
 			
-			try {
-	            DbxEntry.File downloadedFile = client.getFile(decryptedString, null,
-	                outputStream);
-	            System.out.println("Metadata: " + downloadedFile.toString());
-	          //input downloadedfile into a new file
-                file = new File(fileName);
-	            System.out.println(file.getName());
-	            
-	            Path path = Paths.get(file.getAbsolutePath());
-	          //parse file into bytes 
-	            byte[] data = Files.readAllBytes(path);
-	            //send the bytes to the client
-	            out.println(Arrays.toString(data));
-			
-			
-			} finally {
-	            outputStream.close();
-	            if(file.exists()){
+			FileModel fileModel = new FileModel();			
+			fileModel.setFileID( Integer.parseInt( request.getParameter("fileID") ) );
+			try{
+				
+				connection = DBAccess.getInstance().openDB();
+				//Get File Path to download from database to download from Dropbox
+				if( getFilePath(fileModel) ){
+					
+					//Decrypting of Path
+					fileModel.setFilePath( AESCipher.DecryptString( fileModel.getPathByte() , fileModel.getIvByte(), fileModel.getSaltByte() ));
+					
+					//Set FileOutputStream to setup temporary location to store the file 
+		 			FileOutputStream outputStream = new FileOutputStream( Constants.getFilePathLocation() + fileModel.getFileName() );
+		 			
+		 			//Download physical File from File Server (Dropbox)
+		 			DbxEntry.File downloadedFile = client.getFile(fileModel.getFilePath(), null, outputStream);
+		 			outputStream.close();
+		 			
+		 			//Get File from the temporary location
+		 			file = new File(Constants.getFilePathLocation() + fileModel.getFileName() );
+		 			
+		 			//parse file into bytes 
+		            byte[] data = Files.readAllBytes( Paths.get(file.getAbsolutePath()) );
+		            //send the bytes to the client
+		            out.println(Arrays.toString(data));
+		            
+		            Log.log("Download Process| "+ request.getParameter("username") + " downloaded " + downloadedFile.toString());
+				}
+				
+				rs.close();
+				preparedStatement.close();
+				connection.close();
+				
+			}catch (SQLException e) {
+				e.printStackTrace();
+				out.println("Download Fail");
+			}catch (Exception e) {
+				e.printStackTrace();
+				out.println("Download Fail");
+			}finally {
+				//This is to delete the physical file in the temp folder
+				if(file.exists()){
 	            	file.delete();
  	            }
+<<<<<<< HEAD
 	        }
 			
 //			out.println("File has been downloaded");
@@ -127,9 +112,42 @@ public class Download extends HttpServlet {
 			out.println("Download Fail");
 		} catch (Exception e) {
 			out.println("Download Fail");
+=======
+			}
+		}else{
+			System.out.println("token fail");
+			out.println("unverified-token");
 		}
-		
-		
+	}
+	
+	/**
+	 * This Function is the to get file Details from the File Table in the Database
+	 * @param fileModel
+	 * @return boolean (true that the Select isDone, false that is not done)
+	 * @throws SQLException
+	 */
+	private boolean getFilePath(FileModel fileModel) throws SQLException{
+		int isDone = 0;
+		preparedStatement = connection.prepareStatement( Constants.SELECT_FileID );
+		preparedStatement.setInt(1, fileModel.getFileID());
+		rs = preparedStatement.executeQuery();
+		if(rs.next()){
+			fileModel.setFileName( rs.getString("file_name") );
+			fileModel.setPathByte( rs.getBytes("file_path") );
+			fileModel.setIvByte( rs.getBytes("file_iv") );
+			fileModel.setSaltByte( rs.getBytes("file_salt") );
+			isDone = 1;
+		}else{
+			Logger.getInstance().PrintInfo("No Such File in Database");
+			out.println("No Such File in Database");
+			isDone = 1;
+		}
+		if(isDone == 1){
+			return true;
+		}else{
+			return false;
+>>>>>>> origin/master
+		}
 	}
 
 }

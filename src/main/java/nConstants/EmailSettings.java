@@ -68,7 +68,7 @@ public class EmailSettings {
 
         try { 
             Object obj = parser.parse(new FileReader(
-                   Constants.getCurrentPath() ));
+                   Constants.getConfigPath() ));
  
             JSONObject jsonObject = (JSONObject) obj;
  
