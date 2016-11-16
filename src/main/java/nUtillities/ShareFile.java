@@ -30,7 +30,6 @@ public class ShareFile extends HttpServlet {
 	private static Log Log = new Log();
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Log.log("User Response POST === " + request.getParameter("users")+ ", " + request.getParameter("fileID")+ ", " + request.getParameter("action"));
 		
 		CurrentUsername = request.getParameter("users");
 		int fileID = Integer.parseInt(request.getParameter("fileID"));
@@ -61,23 +60,21 @@ public class ShareFile extends HttpServlet {
 			        		//else add to List, errorUserList, to be returned to user to notify that user does not exist.
 			            	String[] userValidity = validateUser(userArray[i]);
 			                if (userValidity != null) {
-			                	System.out.println(userArray[i] + " is validated.");
 			                	int currentUserID = Integer.parseInt(userValidity[0]);
 			                	if (validateUserPermission(currentUserID, fileID) == 0)
 			                	{
 				                	userIDs.add(currentUserID);
 				                	userNames.add(userValidity[1]);
+				                	Log.log("ShareFile Process| "+ CurrentUsername + "is now sharing fileID:" + fileID + " with UserID"+ currentUserID);
 			                	}
 			                }
 			                else
 			                {
-			                	System.out.println(userArray[i] + " is not validated.");
 			                	errorUserList.add(userArray[i]);
 			                }
 			            }
 			        	//Share to all users in userID List
 			        	shareFile(userIDs, fileID);
-			        	System.out.println(errorUserList + ",accepted="+userNames);
 			        	out.print(errorUserList + ",accepted="+userNames);
 			        }
 			        else
@@ -105,15 +102,15 @@ public class ShareFile extends HttpServlet {
 			        	//Validate if user is registered
 		            	String[] userValidity = validateUser(users);
 			        	if (userValidity != null) {
-		                	System.out.println(users + " is validated.");
 		                	removedUserID = Integer.parseInt(userValidity[0]);
 		                	removedUser = userValidity[1];
 		                }
 		                else
 		                {
-		                	System.out.println(users + " does not exist.");
 		                	out.print("User");
 		                }
+			        	Log.log("ShareFile Process| "+ CurrentUsername + " stop sharing fileID:" + fileID + " with UserID"+ removedUserID);
+		  
 			        	out.print(removeUserPermission(removedUserID, fileID));
 			        }
 			        else
@@ -156,8 +153,7 @@ public class ShareFile extends HttpServlet {
 				{
 					//TODO: Return update error to user
 				}
-			}
-			
+			}		
 			preparedStatement.close();
 			connection.close();
 			
@@ -185,13 +181,11 @@ public class ShareFile extends HttpServlet {
 			ResultSet rs = preparedStatement.executeQuery();
 			
 			if(rs.next()){
-				System.out.println("validateUser(): " + user + " is validated");
 				userInfo[0] = rs.getString("user_ID");
 				userInfo[1] = rs.getString("username");
 			}
 			else
 			{
-				System.out.println("validateUser(): " + user + " is not validated");
 				userInfo = null;
 			}
 			
@@ -200,7 +194,6 @@ public class ShareFile extends HttpServlet {
 			connection.close();
 			
 		} catch (Exception e) {
-			System.out.println("validateUser(): " + e.toString());
 		}
 		return userInfo;
 	}
@@ -222,12 +215,10 @@ public class ShareFile extends HttpServlet {
 			ResultSet rs = preparedStatement.executeQuery();
 			
 			if(rs.next()){
-				System.out.println("validateFile(): File is validated");
 				valid = true;
 			}
 			else
 			{
-				System.out.println("validateFile(): File is not validated");
 				valid = false;
 			}
 			
@@ -236,7 +227,6 @@ public class ShareFile extends HttpServlet {
 			connection.close();
 			
 		} catch (Exception e) {
-			System.out.println("validateFile(): " + e.toString());
 		}
 		return valid;
 	}
@@ -258,11 +248,11 @@ public class ShareFile extends HttpServlet {
 			ResultSet rs = preparedStatement.executeQuery();
 			
 			if(rs.next()){
-				Log.log("ShareFile Process| "+ CurrentUsername + "'s "+ fileID + " is shared to " + userID);
+				Log.log("ShareFile Process| "+ CurrentUsername + "'s fileID:"+ fileID + " is shared to UserID:" + userID);
 				return 1;
 			}
 			else {
-				Log.warn("ShareFile Process| "+ CurrentUsername + "'s "+ fileID + " is not shared to " + userID);
+				Log.log("ShareFile Process| "+ CurrentUsername + "'s fileID:"+ fileID + " has stop sharing to UserID:" + userID);
 			}
 			
 			rs.close();
