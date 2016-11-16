@@ -103,16 +103,7 @@ public class Download extends HttpServlet {
 				if(file.exists()){
 	            	file.delete();
  	            }
-<<<<<<< HEAD
-	        }
-			
-//			out.println("File has been downloaded");
-//			Log.log("Download Process|"+ home + " downloaded file '" + fileName + "'");
-		}catch (SQLException e) {
-			out.println("Download Fail");
-		} catch (Exception e) {
-			out.println("Download Fail");
-=======
+
 			}
 		}else{
 			System.out.println("token fail");
@@ -138,7 +129,6 @@ public class Download extends HttpServlet {
 			fileModel.setSaltByte( rs.getBytes("file_salt") );
 			isDone = 1;
 		}else{
-			Logger.getInstance().PrintInfo("No Such File in Database");
 			out.println("No Such File in Database");
 			isDone = 1;
 		}
@@ -146,7 +136,7 @@ public class Download extends HttpServlet {
 			return true;
 		}else{
 			return false;
->>>>>>> origin/master
+
 		}
 	}
 
