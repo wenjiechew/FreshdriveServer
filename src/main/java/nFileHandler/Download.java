@@ -26,6 +26,7 @@ import com.dropbox.core.DbxRequestConfig;
 import nConstants.DropboxSettings;
 import nDatabase.DBAccess;
 import nUtillities.AESCipher;
+import nUtillities.Log;
 import nUtillities.Logger;
 
 /**
@@ -36,6 +37,7 @@ public class Download extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
+	private static Log Log = new Log();
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -102,6 +104,7 @@ public class Download extends HttpServlet {
 	        }
 			
 			out.println("File has been downloaded");
+			Log.log("Download Process|"+ home + " downloaded file '" + fileName + "'");
 		}catch (SQLException e) {
 			Logger.getInstance().PrintError("download sql() ", e.toString());
 			out.println("Download Fail");

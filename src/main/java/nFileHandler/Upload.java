@@ -19,21 +19,31 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.dropbox.core.*;
 
+import nConstants.Constants;
+import nConstants.DropboxSettings;
 import nDatabase.DBAccess;
 import nLogin.Validate;
+import nObjectModel.FileModel;
 import nUtillities.AESCipher;
 import nUtillities.Logger;
 
 /**
+ * This Serlvet only allow POST, from the client, Which first validates the right user before executing the main task. @return unverified-token 
+ * Upon token is validated. file will be checked if it's existed in the applicaiton @return file Exists
+ * else file will be uploaded into the dropbox then updates the file table in the database, following by updating the
+ * permission table.
  * Servlet implementation class Upload
  */
 @WebServlet("/Upload")
 public class Upload extends HttpServlet {
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
-	PreparedStatement permissionStatement;
-	private static final long serialVersionUID = 1L;
-	static final int BUFFER_SIZE = 524288000;
+	private static ResultSet rs;
+	
+	private static final long serialVersionUID = 1L;	
+	
+	private static DbxRequestConfig config = new DbxRequestConfig("FreshDrive", Locale.getDefault().toString());
+	private static DbxClient client = new DbxClient(config, DropboxSettings.getInstance().getAccessToken() );
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
@@ -41,192 +51,142 @@ public class Upload extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		System.out.println("Upload Servlet Begin");
 		response.setContentType("text/html;");
 		PrintWriter out = response.getWriter();
-		//
-
-		DbxRequestConfig config = new DbxRequestConfig("FreshDrive", Locale.getDefault().toString());
-		//
-		// // access token for the dropbox account. may need to encrypt this
-		String accessToken = "-TcOHePlr9AAAAAAAAAACMWGsYvDXPTDcThy6nM8r0hwG-Mz5cEqtDxcDygkg9i3";
-		//
-		System.out.println("Connect to dropbox");
-		DbxClient client;
-		client = new DbxClient(config, accessToken);
-
-		//
-		// get the file path from the property sent from the client side
-		String filePath = request.getHeader("filePath");
-		// get the filelength from the client side also
-		Long fileLength = Long.parseLong(request.getHeader("fileLength"));
-		String username = request.getHeader("username");
-		String token = request.getHeader("usertoken");
-		String ownerId = request.getHeader("ownerID");
-		String createdOn = request.getHeader("createdOn");
-		String expireDate = request.getHeader("expiryDate");
-		String fileName = request.getHeader("fileName");
-		File inputFile = new File(filePath);
-		System.out.println("File Path: " + filePath);
-		boolean fileExist;
 		
-		//Verify user's token first
-		if(Validate.verifyToken(token,username)==1){
-			try {
-				fileExist = checkIfFileExist(fileName, ownerId); 
-				if (fileExist) {
-					// get the input from the client's output stream
+		//New File()
+		File inputFile = new File( request.getHeader("filePath") );
+		
+		//New FileModel and Store Request Data
+		FileModel fileModel = new FileModel();
+		
+		//Encrpting the Path to get the IV, Salt and the encrypted Path
+		byte[][] encryptedFilePath = AESCipher.EncryptString( request.getHeader("filePath") );
+		
+		fileModel.setUserName( request.getHeader("username") );
+		fileModel.setFileName( request.getHeader("fileName") );
+		fileModel.setPathByte( encryptedFilePath[0] );
+		fileModel.setIvByte( encryptedFilePath[1] );
+		fileModel.setSaltByte( encryptedFilePath[2] );
+		fileModel.setCreatedOn( request.getHeader("createdOn") );
+		fileModel.setOwnderID( request.getHeader("ownerID") );
+		fileModel.setFileLength( request.getHeader("fileLength"));
+		if (request.getHeader("expiryDate") != "" ){
+			fileModel.setExpiredDate( Date.valueOf( request.getHeader("expiryDate") ) );
+		}
+		
+		//user-token AND username Validation
+		if (Validate.verifyToken( request.getHeader("usertoken"), fileModel.getUserName() ) == 1){
+			
+			//Check File Exist in the Database/FileServer ( true = Exist // false = not exist )
+			//if Not Exit Do Upload
+			try{
+				connection = DBAccess.getInstance().openDB();
+				
+				if(checkIfFileExisted(fileModel)){
+					//Get the Remaing bytes of the uploading files
 					ServletInputStream fileInputStream = request.getInputStream();
-					//
-					//
-					System.out.println("Receiving data...");
-	
-					// Try uploading to dropbox
-					System.out.println("Try uploading");
-					// System.out.println(inputStream.available());
-					try {
-						boolean dbSuccess = addFileToDb(fileName, filePath, fileLength, createdOn, ownerId, expireDate);	//INSERT OWNER ID
-						//if successfully added to database then upload file to dropbox
-						if(dbSuccess){
-						// writing the file into the dropbox
-						DbxEntry.File uploadedFile = client.uploadFile("/" + username + "/" + inputFile.getName(),
-								DbxWriteMode.add(), fileLength, fileInputStream);
-						System.out.println("Uploaded: " + uploadedFile.toString());
-						response.setContentType("text/html");
-						out.println("File Uploaded");
-						//TODO if fail, rollback (i.e. delete) created file record inside database 
+					
+					//Do upload to Dropbox
+					DbxEntry.File uploadedFile = client.uploadFile("/" + fileModel.getUserName() + "/" + inputFile.getName(),
+													DbxWriteMode.add(), Long.parseLong( fileModel.getFileLength() ), fileInputStream);
+					Logger.getInstance().PrintInfo("Uploaded: " + uploadedFile.toString() + " into Dropbox");
+					//Update File Table in Database
+					//Check if update done isDone = true
+					if(addFileToDatabase(fileModel)){
 						
-						// client.delete("/test (2).txt");
-	
-						}
-	
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						out.println("File Failed");
-						e.printStackTrace();
+						//Update Permission Table
+						insertPermissiontoDatabase(fileModel);
+						
+					}else{
+						client.delete( AESCipher.DecryptString(fileModel.getPathByte(), fileModel.getIvByte(), fileModel.getSaltByte()));
+						Logger.getInstance().PrintError(getServletName(), "Unable to Update File Table in Database");
 					}
-					response.setContentType("text/html");
-					out.println("File uploaded");
+					
+					out.println("File Uploaded");
+					
 				}else{
-					response.setContentType("text/html");
 					out.println("File already exist");
 				}
-					
 				
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-		else{
-			//Invalid user token
-			response.setContentType("text/html");
+				rs.close();
+				preparedStatement.close();
+				connection.close();	
+			}catch (SQLException e) {
+				Logger.getInstance().PrintError("openDB() ", e.toString());
+			} catch (Exception e) {
+				Logger.getInstance().PrintError("openDB() ", e.toString());
+			}			
+		}else{
+			Logger.getInstance().PrintInfo("Unable to Validate User");
+			//TODO Change Return ERROR
 			out.println("unverified-token");
-		}
+		}			
 
-	}
-
-	private boolean checkIfFileExist(String fileName, String owner_id) throws Exception {
-		// TODO Auto-generated method stub
-		// true: don't exist, false: exist
-		int count = 0;
-		ResultSet rset = null;
-		try {
-
-			connection = DBAccess.getInstance().openDB();
-			// Get password for selected user account based on given username
-			preparedStatement = connection.prepareStatement("SELECT Count(file_id) from files WHERE file_name=? AND file_ownerID =?");
-			preparedStatement.setString(1, fileName);
-			preparedStatement.setString(2, owner_id);
-			rset = preparedStatement.executeQuery();
-			if (rset.next()) {
-				count = rset.getInt(1);
-//				System.out.println("COUNTER: "+count);
-			}
-		} finally {
-			if (rset != null) {
-				try {
-					rset.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (preparedStatement != null) {
-				try {
-					preparedStatement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-
-		}
-		rset.close();
-		preparedStatement.close();
-		connection.close();
-//		System.out.println("COUNTER: "+count);
-		return (count == 0);
-	}
-
-	public boolean addFileToDb(String fileName, String filePath, long fileLength, String createdOn, String owner_id,
-			String expireOn) {
-		try {
-			Date expireDate;
-			if (expireOn.equals("")) {
-				expireDate = null;
-			} else {
-				expireDate = Date.valueOf(expireOn);
-			}
-			byte[][] encryptedFilePath = AESCipher.EncryptString(filePath);
-			byte[] pathByte = encryptedFilePath[0];
-			byte[] ivByte = encryptedFilePath[1];
-			byte[] saltByte = encryptedFilePath[2];
-			
-			connection = DBAccess.getInstance().openDB();
-			// Get password for selected user account based on given username
-			preparedStatement = connection.prepareStatement(
-					"INSERT INTO files (file_name, file_path, file_size, file_createdOn, file_ownerID, file_expireOn, file_salt, file_iv) "
-							+ "VALUES (?,?,?,?,?,?,?,?)");
-			preparedStatement.setString(1, fileName);
-			preparedStatement.setBytes(2, pathByte);
-			preparedStatement.setString(3, Long.toString(fileLength));
-			preparedStatement.setString(4, createdOn);
-			preparedStatement.setString(5, owner_id);
-			preparedStatement.setDate(6, expireDate);
-			preparedStatement.setBytes(7, saltByte);
-			preparedStatement.setBytes(8, ivByte);
-			preparedStatement.executeUpdate();
-
-
-			preparedStatement.close();
-			connection.close();
-			insertIntoPermissions(fileName, owner_id);
-			return true;
-		} catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
-		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
-		}
-		return false;
 	}
 	
-	public void insertIntoPermissions(String fileName, String ownerId){
-		try{
-		connection = DBAccess.getInstance().openDB();
-		// Get password for selected user account based on given username
-		preparedStatement = connection.prepareStatement("INSERT INTO permissions (permission_fileID, permission_sharedToUserID)"
-														+ "VALUES((SELECT file_ID FROM files WHERE file_name = '"+fileName+"' AND file_ownerID = '"+ownerId+"'), '"+ownerId+"' )");
-		preparedStatement.executeUpdate();
-		
-		preparedStatement.close();
-		connection.close();
-		
-															
-		}catch (SQLException e) {
-			Logger.getInstance().PrintError("Insert into permission sql error", e.toString());
-		} catch (Exception e) {
-			Logger.getInstance().PrintError("Insert into permission exception error", e.toString());
+	/**
+	 * This Function check if stated 'fileName' owned by the owner_id is already in the database
+	 * @param fileName
+	 * @param owner_id
+	 * @return Boolean True / False (Count >= 1 is False || Count == 0 is True )
+	 * @throws SQLException
+	 */
+	private boolean checkIfFileExisted(FileModel fileModel) throws SQLException {
+		int count = 0;
+		preparedStatement = connection.prepareStatement( Constants.SELECT_FileOwnerID );
+		preparedStatement.setString(1, fileModel.getFileName());
+		preparedStatement.setString(2, fileModel.getOwnderID());
+		rs = preparedStatement.executeQuery();
+		if(rs.next()){
+			count = rs.getInt(1);
 		}
+		rs.close();
+		return (count == 0);		
 	}
+	
+	/**
+	 * This function will update the 'file' Table in the database with all the required column values.
+	 * @param fileModel
+	 * @return boolean (true= the function has success, false= not done)
+	 * @throws SQLException
+	 */
+	public boolean addFileToDatabase (FileModel fileModel) throws SQLException {
+		int isDone = 0;
+		preparedStatement = connection.prepareStatement( Constants.INSERT_FileTable );
+		preparedStatement.setString(1, fileModel.getFileName());
+		preparedStatement.setBytes(2, fileModel.getPathByte());
+		preparedStatement.setString(3, fileModel.getFileLength());
+		preparedStatement.setString(4, fileModel.getCreatedOn());
+		preparedStatement.setString(5, fileModel.getOwnderID());
+		preparedStatement.setDate(6, fileModel.getExpiredDate());
+		preparedStatement.setBytes(7, fileModel.getSaltByte());
+		preparedStatement.setBytes(8, fileModel.getIvByte());
+		isDone = preparedStatement.executeUpdate();
+		if (isDone > 0){
+			return true;
+		}
+		else{
+			return false;
+		}
+				
+	}
+	
+	/**
+	 * This function insert into the 'Permission' Table in the Database
+	 * making sure that the file_ID and file_name is the current User 
+	 * @param fileModel
+	 * @throws SQLException
+	 */
+	public void insertPermissiontoDatabase (FileModel fileModel) throws SQLException {
+		
+		preparedStatement = connection.prepareStatement( Constants.INSERT_FilePermission );
+		preparedStatement.setString(1, fileModel.getFileName());
+		preparedStatement.setString(2, fileModel.getOwnderID());
+		preparedStatement.setString(3, fileModel.getOwnderID());
+		preparedStatement.executeUpdate();
 
+		
+		
+	}
 }

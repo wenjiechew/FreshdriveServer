@@ -16,6 +16,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import nDatabase.DBAccess;
 import nObjectModel.Account;
+import nUtillities.Log;
 import nUtillities.Logger;
 
 /**
@@ -26,7 +27,8 @@ public class Register extends HttpServlet {
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
 	private static final long serialVersionUID = 1L;
-
+	private static Log Log = new Log();
+	
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -43,7 +45,8 @@ public class Register extends HttpServlet {
         if(createUser(account)){
             Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Registered");            
             response.setContentType("text/html");            
-            out.println("Registered");          
+            out.println("Registered");
+            Log.log("Register Process|New account:'"+ account.getUsername() + " ' created");
             
         }
         else {

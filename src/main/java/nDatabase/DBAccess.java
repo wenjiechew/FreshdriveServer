@@ -21,7 +21,11 @@ public class DBAccess {
 	public static DBAccess getInstance() { 
 		if( instance == null ) { instance = new DBAccess(); }	
 		return instance;
-	}	
+	}
+	
+	public static DBAccess instanceCheck(){
+		return instance;
+	}
 	
 	private Connection connection;
 	

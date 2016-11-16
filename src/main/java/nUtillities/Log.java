@@ -24,5 +24,10 @@ final static Logger logger = Logger.getLogger(Log.class);
 	{
 		logger.debug(msg);
 	}
+	
+	public void warn(String msg)
+	{
+		logger.warn(msg);
+	}
 
 }

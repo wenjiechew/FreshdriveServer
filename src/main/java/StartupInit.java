@@ -47,8 +47,11 @@ public class StartupInit implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce)  { 
         
     	executorService.shutdown();
+    	
     	try {
-			DBAccess.getInstance().closeDB();
+			if(DBAccess.instanceCheck() != null){
+				DBAccess.instanceCheck().closeDB();
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

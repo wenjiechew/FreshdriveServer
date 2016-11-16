@@ -14,7 +14,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.MessagingException;
-
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -75,10 +76,11 @@ public class Login extends HttpServlet {
 				// Active token existing; someone is currently logged in with
 				// the account
 				out.println("active-token");
+				Log.log("Login Process|"+ account.getUsername() + " is already logged in");
 			} else {
 				Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Validate");
 				Logger.getInstance().PrintInfo("User name: " + account.getUsername());
-				Log.log("Login Sucessful");
+				Log.log("Login Process|"+ account.getUsername() + " password matched");
 				try {
 					account.setEmail(getEmail(account.getUsername()));
 					sendEmail(account);
@@ -206,4 +208,13 @@ public class Login extends HttpServlet {
 		}
 		return otp;
 	}
+	
+	/**
+     * @see ServletContextListener#contextDestroyed(ServletContextEvent)
+     */
+    public void contextDestroyed(ServletContextEvent sce)  { 
+        //Destroy all created threads, if any
+    	if(executorService!=null)
+    		executorService.shutdown();
+    }
 }
