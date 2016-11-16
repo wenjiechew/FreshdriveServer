@@ -31,7 +31,6 @@ import nConstants.DropboxSettings;
 import nDatabase.DBAccess;
 import nUtillities.AESCipher;
 import nUtillities.Log;
-import nUtillities.Logger;
 
 /**
  * Servlet implementation class Download
@@ -125,10 +124,8 @@ public class Download extends HttpServlet {
 //			out.println("File has been downloaded");
 //			Log.log("Download Process|"+ home + " downloaded file '" + fileName + "'");
 		}catch (SQLException e) {
-			Logger.getInstance().PrintError("download sql() ", e.toString());
 			out.println("Download Fail");
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("download exception() ", e.toString());
 			out.println("Download Fail");
 		}
 		

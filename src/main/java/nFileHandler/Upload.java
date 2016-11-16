@@ -22,7 +22,6 @@ import com.dropbox.core.*;
 import nDatabase.DBAccess;
 import nUtillities.AESCipher;
 import nUtillities.Log;
-import nUtillities.Logger;
 
 /**
  * Servlet implementation class Upload
@@ -195,9 +194,7 @@ public class Upload extends HttpServlet {
 			insertIntoPermissions(fileName, owner_id);
 			return true;
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		}
 		return false;
 	}
@@ -215,9 +212,7 @@ public class Upload extends HttpServlet {
 		
 															
 		}catch (SQLException e) {
-			Logger.getInstance().PrintError("Insert into permission sql error", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("Insert into permission exception error", e.toString());
 		}
 	}
 

@@ -25,6 +25,7 @@ public class SharingList extends HttpServlet {
 	private static PreparedStatement preparedStatement;
 	private static final long serialVersionUID = 1L;
 	private static Log Log = new Log();
+	private static String CurrentUsername ;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -39,8 +40,7 @@ public class SharingList extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("fileID"));
-		
+		CurrentUsername = request.getParameter("username");
 		int fileID = Integer.parseInt(request.getParameter("fileID"));
 		
 		response.setContentType("text/html;charset=UTF-8");
@@ -85,16 +85,13 @@ public class SharingList extends HttpServlet {
 			
 			if(rs.next()){
 				username = rs.getString("username");
-				System.out.println("getSharedUsernames(): Added " + username);
-				Logger.getInstance().PrintInfo("getSharedUsernames(): Added " + username);
+				Log.log("SharingList Process| "+ CurrentUsername +"Added " + username);
 			}
 			
 			rs.close();
 			preparedStatement.close();
 			connection.close();
 		} catch (Exception e) {
-			System.out.println("getSharedUsernames(): " + e.toString());
-			Logger.getInstance().PrintError("getSharedUsernames() ", e.toString());
 		}
 		
 		return username;
@@ -120,13 +117,9 @@ public class SharingList extends HttpServlet {
 				do {
 					sharedUsers.add(rs.getInt("permission_sharedToUserID"));
 				} while (rs.next());
-				System.out.println("getSharingUsers(): Shared users = " + sharedUsers.toString());
-				Logger.getInstance().PrintInfo("getSharingUsers(): Shared users = " + sharedUsers.toString());
-			}
+				}
 			else
 			{
-				System.out.println("getSharingUsers(): Unshared.");
-				Logger.getInstance().PrintInfo("getSharingUsers(): Unshared.");
 				sharedUsers = null;
 			}
 			
@@ -134,9 +127,7 @@ public class SharingList extends HttpServlet {
 			preparedStatement.close();
 			connection.close();
 		} catch (Exception e) {
-			System.out.println("getSharingUsers(): " + e.toString());
-			Logger.getInstance().PrintError("getSharingUsers() ", e.toString());
-		}
+			}
 		return sharedUsers;
 	}
 }

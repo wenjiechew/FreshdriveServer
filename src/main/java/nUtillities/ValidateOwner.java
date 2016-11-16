@@ -36,7 +36,6 @@ public class ValidateOwner extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("userID") + " AND " +  request.getParameter("fileID"));
 		
 		int fileID = Integer.parseInt(request.getParameter("fileID"));
 		int userID = Integer.parseInt(request.getParameter("userID"));
@@ -70,13 +69,11 @@ public class ValidateOwner extends HttpServlet {
 				System.out.print(ownerID);
 				if (ownerID == userID){
 					System.out.println("validateOwnership(): Owner validated.");
-					Logger.getInstance().PrintInfo("validateOwnership(): Owner validated.");
 					return true;
 				}
 				else
 				{
 					System.out.println("validateOwnership(): User is not the file owner.");
-					Logger.getInstance().PrintInfo("validateOwnership(): User is not the file owner.");
 					return false;
 				}
 			}
@@ -85,7 +82,6 @@ public class ValidateOwner extends HttpServlet {
 			connection.close();
 		} catch (Exception e) {
 			System.out.println("validateOwnership(): " + e.toString());
-			Logger.getInstance().PrintError("validateOwnership() ", e.toString());
 		}
 		return false;
 	}

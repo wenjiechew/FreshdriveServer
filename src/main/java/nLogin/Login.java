@@ -34,7 +34,6 @@ import java.util.Properties;
 
 import nDatabase.DBAccess;
 import nObjectModel.Account;
-import nUtillities.Logger;
 import nUtillities.Log;
 
 /**
@@ -60,10 +59,7 @@ public class Login extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		Logger.getInstance().PrintInfo("User Response POST === " + request.getParameter("username") + " AND "
-				+ request.getParameter("password"));
-
-		response.setContentType("text/html;charset=UTF-8");
+			response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		
 		Account account = new Account();
@@ -78,21 +74,16 @@ public class Login extends HttpServlet {
 				out.println("active-token");
 				Log.log("Login Process|"+ account.getUsername() + " is already logged in");
 			} else {
-				Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Validate");
-				Logger.getInstance().PrintInfo("User name: " + account.getUsername());
 				Log.log("Login Process|"+ account.getUsername() + " password matched");
 				try {
 					account.setEmail(getEmail(account.getUsername()));
 					sendEmail(account);
-					Logger.getInstance().PrintInfo(account.getEmail());
 					out.println("to-2FA");
 				} catch (Exception ex) {
-					Logger.getInstance().PrintInfo(ex.toString());
 					out.println("1");
 				}
 			}
 		} else {
-			Logger.getInstance().PrintInfo("Account : is NOT Validate");
 			out.println("1");
 		}
 	}
@@ -116,9 +107,7 @@ public class Login extends HttpServlet {
 			connection.close();
 
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		}
 		return email;
 	}
@@ -177,11 +166,8 @@ public class Login extends HttpServlet {
 			preparedStatement.close();
 			connection.close();
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() DB Error", e.toString());
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 		}
-		System.out.println("OTP expired");
 		executorService.shutdown();
 	}
 
@@ -200,10 +186,8 @@ public class Login extends HttpServlet {
 			preparedStatement.close();
 			connection.close();;
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() DB Error", e.toString());
 			otp = 0;
 		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
 			otp = 0;
 		}
 		return otp;

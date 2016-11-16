@@ -17,7 +17,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import nDatabase.DBAccess;
 import nObjectModel.Account;
 import nUtillities.Log;
-import nUtillities.Logger;
 
 /**
  * Servlet implementation class Login
@@ -43,15 +42,12 @@ public class Register extends HttpServlet {
         account.setEmail(request.getParameter("email"));
         
         if(createUser(account)){
-            Logger.getInstance().PrintInfo("Account : SUCCESSFULLY Registered");            
             response.setContentType("text/html");            
-            out.println("Registered");
             Log.log("Register Process|New account:'"+ account.getUsername() + " ' created");
             
         }
         else {
-            Logger.getInstance().PrintInfo("Account : is NOT Registered");
-			response.setContentType("text/html" );
+          response.setContentType("text/html" );
 			
 			out.println("1");
         }
@@ -74,10 +70,8 @@ public class Register extends HttpServlet {
 			return true;
 			
 		} catch (SQLException e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
-		} catch (Exception e) {
-			Logger.getInstance().PrintError("openDB() ", e.toString());
-		}		
+			} catch (Exception e) {
+			}		
 		return false;
 	}
 

@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 import nConstants.Constants;
 import nConstants.DBSettings;
-import nUtillities.Logger;
 
 /**
  * The Class is create a Connection with the mySQL database.
@@ -41,14 +40,11 @@ public class DBAccess {
 		
 		//Opening Connection		
 		connection = DriverManager.getConnection( setting.getDB_URL() , setting.getDB_USER(), setting.getDB_PASS());
-		Logger.getInstance().PrintInfo("Database Successful Connection");
 		return connection;			
 	}
 	
 	public void closeDB() throws SQLException {
 		connection.close();
-		
-		Logger.getInstance().PrintInfo("Database is Closed");
 	}
 	
 	

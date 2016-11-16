@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import nConstants.ScanSettings;
 import nLogin.Validate;
 import nUtillities.Log;
-import nUtillities.Logger;
 
 /**
  * Servlet implementation class ScanFile
@@ -29,7 +28,6 @@ public class ScanFile extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Logger.getInstance().PrintInfo("username = " + request.getParameter("username") + " of this " + request.getParameter("user_token") + " request Scan");
 		// TODO Auto-generated method stub
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
