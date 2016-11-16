@@ -62,7 +62,7 @@ public class Download extends HttpServlet {
 				
 		int fileID = Integer.parseInt(request.getParameter("fileID"));
 		String fileName = "";
-		File file = null;;
+		File file = null;
 	     
 		try{
 			connection = DBAccess.getInstance().openDB();
