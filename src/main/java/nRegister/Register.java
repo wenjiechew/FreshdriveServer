@@ -44,11 +44,10 @@ public class Register extends HttpServlet {
         if(createUser(account)){
             response.setContentType("text/html");            
             Log.log("Register Process|New account:'"+ account.getUsername() + " ' created");
-            
+            out.println("Registered");
         }
         else {
-          response.setContentType("text/html" );
-			
+			response.setContentType("text/html" );
 			out.println("1");
         }
 	}
