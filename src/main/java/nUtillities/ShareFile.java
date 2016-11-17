@@ -26,16 +26,16 @@ public class ShareFile extends HttpServlet {
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
 	private static final long serialVersionUID = 1L;
-	private static String CurrentUsername ;
 	private static Log Log = new Log();
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		CurrentUsername = request.getParameter("users");
+
 		int fileID = Integer.parseInt(request.getParameter("fileID"));
 		String action = request.getParameter("action");
-		String users = request.getParameter("users");
 		String token = request.getParameter("token");
+		//User(s) that will be added/removed from sharing
+		String users = request.getParameter("users");
+		//User (file owner) that is performing the action
 		String username = request.getParameter("username");
 		
 		response.setContentType("text/html;charset=UTF-8");
@@ -47,10 +47,8 @@ public class ShareFile extends HttpServlet {
 	        List<Integer> userIDs = new ArrayList<Integer>();
 	        List<String> userNames = new ArrayList<String>();
 	        
-	        
 	        //Sharing of file to users
 	        if (action.equals("add")){
-	        	//TODO: When will fileID be 0?
 		        if (fileID != 0){
 		        	//Validate if file exists in database
 			        if (validateFile(fileID)){
@@ -65,7 +63,7 @@ public class ShareFile extends HttpServlet {
 			                	{
 				                	userIDs.add(currentUserID);
 				                	userNames.add(userValidity[1]);
-				                	Log.log("ShareFile Process| "+ CurrentUsername + " is now sharing fileID:" + fileID + " with UserID:"+ currentUserID);
+				                	Log.log("ShareFile Process| "+ username + " is now sharing fileID:" + fileID + " with " + userValidity[1]);
 			                	}
 			                }
 			                else
@@ -74,7 +72,7 @@ public class ShareFile extends HttpServlet {
 			                }
 			            }
 			        	//Share to all users in userID List
-			        	shareFile(userIDs, fileID);
+			        	shareFile(userIDs, fileID, userNames, errorUserList);
 			        	out.print(errorUserList + ",accepted="+userNames);
 			        }
 			        else
@@ -93,8 +91,6 @@ public class ShareFile extends HttpServlet {
 	        else if (action.equals("remove"))
 	        {
 	        	int removedUserID = 0;
-	        	
-	        	//TODO: When will fileID be 0?
 		        if (fileID != 0){
 		        	//Validate if file exists in database
 			        if (validateFile(fileID)){
@@ -107,8 +103,7 @@ public class ShareFile extends HttpServlet {
 		                {
 		                	out.print("User");
 		                }
-			        	Log.log("ShareFile Process| "+ CurrentUsername + " stop sharing fileID:" + fileID + " with UserID"+ removedUserID);
-		  
+			        	Log.log("ShareFile Process| "+ username + " stopped sharing fileID:" + fileID + " with "+ userValidity[1]);
 			        	out.print(removeUserPermission(removedUserID, fileID));
 			        }
 			        else
@@ -129,14 +124,15 @@ public class ShareFile extends HttpServlet {
 	
 	/**
 	 * Updates database to grant permission to specified users for a file
-	 * @param users
-	 * @param fileID
-	 * @return
+	 * @param users	list of user(s) ID to whom the file will be shared 
+	 * @param fileID	id of the file that will be shared
+	 * @param userNames	list of username corresponding to users
+	 * @param errorUserList	list of users that are not weren't managed to be shared with (i.e. errored)
+	 * @return 1 if at least partially successful, else 0. 
 	 */
-	public static int shareFile(List<Integer> users, int fileID){
+	public static int shareFile(List<Integer> users, int fileID, List<String> userNames, List<String> errorUserList){
 		try {
 			connection = DBAccess.getInstance().openDB();
-			
 			for (int i = 0; i < users.size(); i++){
 				preparedStatement = connection.prepareStatement("INSERT INTO permissions (permission_fileID, permission_sharedToUserID) "
 						+ "VALUES (?,?)");
@@ -146,17 +142,18 @@ public class ShareFile extends HttpServlet {
 				int rs = preparedStatement.executeUpdate();
 				
 				if (rs == 1){
+					//Working well; do nothing and continue with execution
 				}
 				else
 				{
-					//TODO: Return update error to user
+					errorUserList.add(userNames.get(i));
 				}
 			}		
 			preparedStatement.close();
 			connection.close();
-			
 			return 1;
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return 0;
 	}
@@ -230,10 +227,10 @@ public class ShareFile extends HttpServlet {
 	}
 	
 	/**
-	 * Validates if specific user has access to the specific file
+	 * Validates if specific user has access to the specific file already.
 	 * @param userID
 	 * @param fileID
-	 * @return 1 (has access) or 0 (no access)
+	 * @return 1 (already has access) or 0 (no access)
 	 */
 	public static int validateUserPermission(int userID, int fileID){
 		try {
@@ -246,11 +243,7 @@ public class ShareFile extends HttpServlet {
 			ResultSet rs = preparedStatement.executeQuery();
 			
 			if(rs.next()){
-				Log.log("ShareFile Process| "+ CurrentUsername + "'s fileID:"+ fileID + " is shared to UserID:" + userID);
 				return 1;
-			}
-			else {
-				Log.log("ShareFile Process| "+ CurrentUsername + "'s fileID:"+ fileID + " has stop sharing to UserID:" + userID);
 			}
 			
 			rs.close();
