@@ -50,7 +50,7 @@ public class VerifyOTP extends HttpServlet {
 				// in the format of id+username+email+token
 				String userInfo = getUserInformation(username);
 				out.println(userInfo);
-				Log.log("Login Process|"+ userInfo + " OTP accepted");
+				Log.log("Login Process|"+ username + " OTP accepted");
 			}
         }
         else if(Validate.verifyOTP(username, otp)==-1){

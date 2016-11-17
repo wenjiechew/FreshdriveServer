@@ -40,7 +40,7 @@ public class SharingList extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		CurrentUsername = request.getParameter("username");
+		CurrentUsername = request.getParameter("users");
 		int fileID = Integer.parseInt(request.getParameter("fileID"));
 		
 		response.setContentType("text/html;charset=UTF-8");
@@ -85,7 +85,7 @@ public class SharingList extends HttpServlet {
 			
 			if(rs.next()){
 				username = rs.getString("username");
-				Log.log("SharingList Process| "+ CurrentUsername +"Added " + username);
+				Log.log("SharingList Process| "+ CurrentUsername +" added " + username);
 			}
 			
 			rs.close();

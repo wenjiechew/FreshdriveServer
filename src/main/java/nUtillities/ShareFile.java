@@ -65,7 +65,7 @@ public class ShareFile extends HttpServlet {
 			                	{
 				                	userIDs.add(currentUserID);
 				                	userNames.add(userValidity[1]);
-				                	Log.log("ShareFile Process| "+ CurrentUsername + "is now sharing fileID:" + fileID + " with UserID"+ currentUserID);
+				                	Log.log("ShareFile Process| "+ CurrentUsername + " is now sharing fileID:" + fileID + " with UserID:"+ currentUserID);
 			                	}
 			                }
 			                else
