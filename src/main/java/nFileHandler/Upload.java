@@ -1,6 +1,6 @@
 package nFileHandler;
 
-import java.io.File;
+//import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -56,29 +56,26 @@ public class Upload extends HttpServlet {
 		response.setContentType("text/html;");
 		PrintWriter out = response.getWriter();
 		
-		//New File()
-		File inputFile = new File( request.getHeader("filePath") );
-		
-		//New FileModel and Store Request Data
-		FileModel fileModel = new FileModel();
-		
-		//Encrpting the Path to get the IV, Salt and the encrypted Path
-		byte[][] encryptedFilePath = AESCipher.EncryptString( request.getHeader("filePath") );
-		
-		fileModel.setUserName( request.getHeader("username") );
-		fileModel.setFileName( request.getHeader("fileName") );
-		fileModel.setPathByte( encryptedFilePath[0] );
-		fileModel.setIvByte( encryptedFilePath[1] );
-		fileModel.setSaltByte( encryptedFilePath[2] );
-		fileModel.setCreatedOn( request.getHeader("createdOn") );
-		fileModel.setOwnderID( request.getHeader("ownerID") );
-		fileModel.setFileLength( request.getHeader("fileLength"));
-		if (request.getHeader("expiryDate") != "" ){
-			fileModel.setExpiredDate( Date.valueOf( request.getHeader("expiryDate") ) );
-		}
-		
 		//user-token AND username Validation
-		if (Validate.verifyToken( request.getHeader("usertoken"), fileModel.getUserName() ) == 1){
+		if (Validate.verifyToken( request.getHeader("usertoken"), request.getHeader("username") ) == 1){
+			
+			//New FileModel and Store Request Data
+			FileModel fileModel = new FileModel();
+			
+			//Encrpting the Path to get the IV, Salt and the encrypted Path
+			byte[][] encryptedFilePath = AESCipher.EncryptString( request.getHeader("filePath") );			
+			fileModel.setFilePath( request.getHeader("filePath") );
+			fileModel.setFileName( request.getHeader("fileName") );
+			fileModel.setPathByte( encryptedFilePath[0] );
+			fileModel.setIvByte( encryptedFilePath[1] );
+			fileModel.setSaltByte( encryptedFilePath[2] );
+			fileModel.setCreatedOn( request.getHeader("createdOn") );
+			fileModel.setOwnderID( request.getHeader("ownerID") );
+			fileModel.setFileLength( request.getHeader("fileLength"));
+			if (request.getHeader("expiryDate") != "" ){
+				fileModel.setExpiredDate( Date.valueOf( request.getHeader("expiryDate") ) );
+			}
+			
 			//Check File Exist in the Database/FileServer ( true = Exist // false = not exist )
 			//if Not Exit Do Upload
 			try{
@@ -89,7 +86,7 @@ public class Upload extends HttpServlet {
 					ServletInputStream fileInputStream = request.getInputStream();
 					
 					//Do upload to Dropbox
-					DbxEntry.File uploadedFile = client.uploadFile("/" + fileModel.getUserName() + "/" + inputFile.getName(),
+					DbxEntry.File uploadedFile = client.uploadFile( fileModel.getFilePath(),
 													DbxWriteMode.add(), Long.parseLong( fileModel.getFileLength() ), fileInputStream);
 					//Update File Table in Database
 					//Check if update done isDone = true
@@ -103,7 +100,7 @@ public class Upload extends HttpServlet {
 					}
 					
 					out.println("File Uploaded");
-					Log.log("Upload Process| " + request.getHeader("username") + "uploaded "+ request.getHeader("filename"));
+					Log.log("Upload Process| " + request.getHeader("username") + " uploaded "+ uploadedFile.toString());
 				}else{
 					out.println("File already exist");
 				}
@@ -111,9 +108,11 @@ public class Upload extends HttpServlet {
 				rs.close();
 				preparedStatement.close();
 				connection.close();	
-			}catch (SQLException e) {
-				} catch (Exception e) {
-				}			
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}			
 		}else{
 			//TODO Change Return ERROR
 			out.println("unverified-token");
