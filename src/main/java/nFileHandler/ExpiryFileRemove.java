@@ -43,18 +43,16 @@ public class ExpiryFileRemove {
 			
 			//Find Files that are expired, that is before current date.
 			findFileStatement = connection.prepareStatement( Constants.SELECT_FileFields );		
-			ResultSet result = findFileStatement.executeQuery();
+			ResultSet result = findFileStatement.executeQuery();			
 			
-			
-			if(result.next()){				
-				
+			if(result.next()){								
 				do{					
 					//Remove Related File From Sharing Permission List
 					deletePermissionOfFiles( result.getString( "file_ID") );
 					
 					//Delete this files from DropBox
 					client.delete( AESCipher.DecryptString( result.getBytes("file_path") , result.getBytes("file_iv") , result.getBytes("file_salt") ));
-//					Logger.getInstance().PrintInfo( result.getString("file_name") + " is deleted" );
+					
 					Log.log("Expiry Process|"+ result.getString("file_name") + " is deleted");
 				}while (result.next());
 				
@@ -67,13 +65,11 @@ public class ExpiryFileRemove {
 
 			result.close();
 			findFileStatement.close();
-			connection.close();
-			
-			
-			
+			connection.close();			
 		}catch(SQLException e){
 			e.printStackTrace();
 		}catch(Exception e){	
+			e.printStackTrace();
 		}
 
 	}
