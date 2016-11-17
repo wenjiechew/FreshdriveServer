@@ -8,7 +8,7 @@ package nConstants;
 public class Constants {
 	static String currentPath = null;
 	static String configFileLocation = "/META-INF/Configuration.json";
-	static String downloadFileLocation = "/META-INF/DownloadTemp/";
+	static String downloadFileLocation = "/Temp-Files/";
 	
 	// JDBC driver name and database URL
 	public static String JDBC_DRIVER = "com.mysql.jdbc.Driver";
