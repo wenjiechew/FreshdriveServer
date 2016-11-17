@@ -43,7 +43,6 @@ public class Retrieve extends HttpServlet {
 		// TODO Auto-generated method stub
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		System.out.println("Retrieve Servlet");
 		
 		JsonArray array = new JsonArray();
 		JsonObject obj = new JsonObject();

@@ -24,35 +24,22 @@ public class SharingList extends HttpServlet {
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
 	private static final long serialVersionUID = 1L;
-	private static Log Log = new Log();
-	private static String CurrentUsername ;
        
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public SharingList() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		CurrentUsername = request.getParameter("users");
+
 		int fileID = Integer.parseInt(request.getParameter("fileID"));
 		
 		response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        System.out.println("doPost(): " + request.getParameter("fileID"));
         
         if (fileID != 0){
     		List<Integer> sharedUsers = new ArrayList<Integer>();
     		sharedUsers = getSharingUsers(fileID);
     		List<String> sharedUsernames = new ArrayList<String>();
-
-	       	if (sharedUsers.size() != 0){
+	       	if (sharedUsers != null && sharedUsers.size() != 0){
 				for (int i = 0; i < sharedUsers.size(); i++){
 					sharedUsernames.add(getSharedUsernames(sharedUsers.get(i)));
 				}
@@ -77,6 +64,7 @@ public class SharingList extends HttpServlet {
 		String username = null;
 		try {
 			connection = DBAccess.getInstance().openDB();
+			
 			preparedStatement = connection.prepareStatement("SELECT username FROM "
 					+ "users WHERE user_ID=?");
 				
@@ -85,7 +73,6 @@ public class SharingList extends HttpServlet {
 			
 			if(rs.next()){
 				username = rs.getString("username");
-				Log.log("SharingList Process| "+ CurrentUsername +" added " + username);
 			}
 			
 			rs.close();

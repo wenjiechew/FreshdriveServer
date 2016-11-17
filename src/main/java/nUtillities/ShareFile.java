@@ -92,7 +92,6 @@ public class ShareFile extends HttpServlet {
 	        //Remove shared user's access to files
 	        else if (action.equals("remove"))
 	        {
-	        	String removedUser = null;
 	        	int removedUserID = 0;
 	        	
 	        	//TODO: When will fileID be 0?
@@ -103,7 +102,6 @@ public class ShareFile extends HttpServlet {
 		            	String[] userValidity = validateUser(users);
 			        	if (userValidity != null) {
 		                	removedUserID = Integer.parseInt(userValidity[0]);
-		                	removedUser = userValidity[1];
 		                }
 		                else
 		                {

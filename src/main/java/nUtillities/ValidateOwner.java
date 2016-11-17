@@ -42,7 +42,6 @@ public class ValidateOwner extends HttpServlet {
 		
 		response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        System.out.println("doPost(): " + request.getParameter("userID") + ", " + request.getParameter("fileID"));
         
         out.print(validateOwnership(userID, fileID));
 	}
@@ -66,7 +65,7 @@ public class ValidateOwner extends HttpServlet {
 			
 			if(rs.next()){
 				ownerID = rs.getInt("file_ownerID");
-				System.out.print(ownerID);
+
 				if (ownerID == userID){
 					System.out.println("validateOwnership(): Owner validated.");
 					return true;
