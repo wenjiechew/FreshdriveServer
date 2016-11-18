@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import nUtillities.Log;
 
 /**
+ * Services log out request, clearing the user's session credentials (i.e. token and OTP)
  * Servlet implementation class Logout
  */
 @WebServlet("/Logout")
@@ -27,7 +28,7 @@ public class Logout extends HttpServlet {
         PrintWriter out = response.getWriter();
 		response.setContentType("text/html" );
         if(Validate.clearTokenOnLogout(request.getParameter("username"))>0){
-            Log.log("Logout Process|"+ request.getParameter("username") + " logged out");
+            Log.log("Logout Process| "+ request.getParameter("username") + " logged out");
             out.println("logged-out");
         }
         else {

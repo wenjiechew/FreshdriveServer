@@ -37,6 +37,9 @@ import nObjectModel.Account;
 import nUtillities.Log;
 
 /**
+ * This servlet services login requests, checking if the requesting user has provided a valid set of credentials
+ * when logging into the system.
+ * 
  * Servlet implementation class Login
  */
 @WebServlet("/Login")
@@ -50,7 +53,7 @@ public class Login extends HttpServlet {
 	private static Session getMailSession;
 	private static MimeMessage generateMailMessage;
 	private SecureRandom sr = new SecureRandom();
-	private ScheduledExecutorService executorService;
+	private ScheduledExecutorService executorService1;
 	private static Log Log = new Log();
 
 	/**
@@ -67,14 +70,20 @@ public class Login extends HttpServlet {
 		account.setPassword(request.getParameter("password"));
 
 		response.setContentType("text/html");
+		
+		/*
+		 * Validates the provided username and password against the database records
+		 * Then validates if that user is already logged into the system (exisiting access token)
+		 * If all clear, then clears user to go ahead for 2FA authenticaton after generating an OTP emailed to them 
+		 */
 		if (Validate.checkUser(account)) {
 			if (Validate.isLoggedIn(account) == 0) {
 				// Active token existing; someone is currently logged in with
 				// the account
 				out.println("active-token");
-				Log.log("Login Process|"+ account.getUsername() + " is already logged in");
+				Log.log("Login Process| "+ account.getUsername() + " is already logged in");
 			} else {
-				Log.log("Login Process|"+ account.getUsername() + " password matched");
+				Log.log("Login Process| "+ account.getUsername() + " password matched");
 				try {
 					account.setEmail(getEmail(account.getUsername()));
 					sendEmail(account);
@@ -87,9 +96,16 @@ public class Login extends HttpServlet {
 			out.println("1");
 		}
 	}
-
-
-	public String getEmail(String userName) throws IOException, KeyManagementException, MessagingException {
+	/**
+	 * Get the email address of the account that is being logged into from database server
+	 * 
+	 * @param userName
+	 * @return email for the given username
+	 * @throws IOException
+	 * @throws KeyManagementException
+	 * @throws MessagingException
+	 */
+	public String getEmail(String userName) {
 		String email = "";
 		try {
 			connection = DBAccess.getInstance().openDB();
@@ -106,56 +122,71 @@ public class Login extends HttpServlet {
 			preparedStatement.close();
 			connection.close();
 
-		} catch (SQLException e) {
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return email;
 	}
 
-	public void sendEmail(Account account) throws IOException, KeyManagementException, MessagingException {
-		// Step1
-		System.out.println("\n 1st ===> setup Mail Server Properties..");
-		mailServerProperties = System.getProperties();
-		mailServerProperties.put("mail.smtp.port", "587");
-		mailServerProperties.put("mail.smtp.auth", "true");
-		mailServerProperties.put("mail.smtp.starttls.enable", "true");
-		System.out.println("Mail Server Properties have been setup successfully..");
-
-		// Step2
-		// Generate OTP for user
-		int OTP = randomSixDigitCode(account.getUsername());
-		if (OTP == 0) {
-			// OTP didn't get generated or stored properly
-			return;
+	/**
+	 * Send email containing the OTP password to the account being logged in
+	 * @param account	object containing username's field 
+	 * @throws IOException
+	 * @throws KeyManagementException
+	 * @throws MessagingException
+	 */
+	public void sendEmail(Account account) {
+		try{
+			// Step1 setup Mail Server Properties
+			mailServerProperties = System.getProperties();
+			mailServerProperties.put("mail.smtp.port", "587");
+			mailServerProperties.put("mail.smtp.auth", "true");
+			mailServerProperties.put("mail.smtp.starttls.enable", "true");
+			
+			//Mail Server Properties have been setup successfully
+	
+			// Step2 Generate OTP for user
+			int OTP = randomSixDigitCode(account.getUsername());
+			if (OTP == 0) {
+				// OTP didn't get generated or stored properly
+				return;
+			}
+			// Creating the email session		
+			getMailSession = Session.getDefaultInstance(mailServerProperties, null);
+			generateMailMessage = new MimeMessage(getMailSession);
+			generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(account.getEmail()));
+			generateMailMessage.setSubject("Freshdrive Log in validation");
+			String emailBody = "Dear " + account.getUsername()
+					+ ",<br><br>Please enter the following code for validating your login: <b>" + OTP
+					+ "</b><br><br> Regards, <br>Freshdrive Admin<br><br> <br><br> <i>Please reply to this email if this log in was not authorised by you</i>";
+			generateMailMessage.setContent(emailBody, "text/html");
+			//Mail session has been created successfully
+	
+			// Step3 Get Session and Send mail
+			Transport transport = getMailSession.getTransport("smtp");
+	
+			transport.connect("smtp.gmail.com", emailSettings.getEmailAddress() , emailSettings.getEmailPass());
+			transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
+			transport.close();
+			
+			Log.log("Login Process| "+account.getUsername()+ " has requested for an OTP to be emailed.");
+			
+			// Make OTP expire after a specific time limit
+			executorService1 = Executors.newScheduledThreadPool(1);
+			executorService1.schedule(() -> {
+				expireOTP(account.getUsername());
+				this.executorService1.shutdownNow();
+			}, 180L, TimeUnit.SECONDS);
 		}
-		// Send Email
-		System.out.println("\n\n 2nd ===> get Mail Session..");
-		getMailSession = Session.getDefaultInstance(mailServerProperties, null);
-		generateMailMessage = new MimeMessage(getMailSession);
-		generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(account.getEmail()));
-		generateMailMessage.setSubject("Freshdrive Log in validation");
-		String emailBody = "Dear " + account.getUsername()
-				+ ",<br><br>Please enter the following code for validating your login: <b>" + OTP
-				+ "</b><br><br> Regards, <br>Freshdrive Admin<br><br> <br><br> <i>Please reply to this email if this log in was not authorised by you</i>";
-		generateMailMessage.setContent(emailBody, "text/html");
-		System.out.println("Mail Session has been created successfully..");
-
-		// Step3
-		System.out.println("\n\n 3rd ===> Get Session and Send mail");
-		Transport transport = getMailSession.getTransport("smtp");
-
-		transport.connect("smtp.gmail.com", emailSettings.getEmailAddress() , emailSettings.getEmailPass());
-		transport.sendMessage(generateMailMessage, generateMailMessage.getAllRecipients());
-		transport.close();
-
-		// Make OTP expire after a specific time limit
-		executorService = Executors.newScheduledThreadPool(1);
-		executorService.schedule(() -> {
-			expireOTP(account.getUsername());
-			executorService.shutdown();
-		}, 180L, TimeUnit.SECONDS);
+		catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 
+	/**
+	 * Schedule an operation to make a generated OTP expire in 3 minutes
+	 * @param username to identify user who has just received an OTP
+	 */
 	private void expireOTP(String username) {
 		try {
 			// Update database with generated OTP
@@ -167,11 +198,19 @@ public class Login extends HttpServlet {
 			preparedStatement.close();
 			connection.close();
 		} catch (SQLException e) {
+			e.printStackTrace();
 		} catch (Exception e) {
-		}
-		executorService.shutdown();
+			e.printStackTrace();
+		}		
 	}
 
+	/**
+	 * Generates a random six digit number that will be used as the OTP 
+	 * and stores OTP inside database for future comparison
+	 * 
+	 * @param	username	for whom the OTP is for
+	 * @return	six digit integer
+	 */
 	public int randomSixDigitCode(String username) {
 		// Randomization with SecureRandom for less chance of collision i.e.
 		// more securely & uniquely random OTP
@@ -198,8 +237,9 @@ public class Login extends HttpServlet {
      * @see ServletContextListener#contextDestroyed(ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent sce)  { 
+    	System.out.println("**********************************                                             ***********************************************************");
         //Destroy all created threads, if any
-    	if(executorService!=null)
-    		executorService.shutdown();
+    	if(executorService1!=null)
+    		executorService1.shutdownNow();
     }
 }

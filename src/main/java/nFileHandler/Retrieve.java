@@ -21,7 +21,9 @@ import nConstants.Constants;
 import nDatabase.DBAccess;
 
 /**
- * This servlet allows POST, to retrieve the FileIDs and FileName related to the user logged ID 
+ * This servlet allows POST, 
+ * to retrieve all the FileIDs and FileName that are permitted (uploaded or shared with) to the user ID 
+ * 
  * Servlet implementation class Retrieve
  */
 @WebServlet("/Retrieve")
@@ -49,16 +51,18 @@ public class Retrieve extends HttpServlet {
 		try {			
 			connection = DBAccess.getInstance().openDB();
 			
-			// Get all the file_IDs and file Names related to the userID logged ID
+			// Get all the file_IDs and file Names permitted to a given user ID
 			preparedStatement = connection.prepareStatement(Constants.SELECT_FileRelatedtoID);
 			preparedStatement.setString(1, request.getParameter("userID")); 
 			rset = preparedStatement.executeQuery();
 			
-			while (rset.next()) {
-			    JsonObject jObj = new JsonObject();
-			    jObj.addProperty("fileId", rset.getString("file_ID") );
-			    jObj.addProperty("fileName", rset.getString("file_name") );
-			    array.add(jObj);
+			if(rset.next()){
+				do{
+					JsonObject jObj = new JsonObject();
+				    jObj.addProperty("fileId", rset.getString("file_ID") );
+				    jObj.addProperty("fileName", rset.getString("file_name") );
+				    array.add(jObj);
+				} while (rset.next());
 			}
 			
 			obj.add("fileNames", array);
@@ -67,11 +71,11 @@ public class Retrieve extends HttpServlet {
 			preparedStatement.close();
 			connection.close();
 		} catch (SQLException e) {
+			e.printStackTrace();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
 		out.print(gson.toJson(obj));
-
 	}
 
 }

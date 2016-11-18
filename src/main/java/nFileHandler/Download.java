@@ -35,7 +35,7 @@ import nUtillities.Log;
 
 /**
  * This class file, checks the user validity, if good it will download the path file the related fileID POST from the 'file' Table in the Database
- * and decrpyt the path stored in Database, to download form dropbox
+ * and decrypt the path stored in Database, to download form dropbox
  * Servlet implementation class Download
  */
 @WebServlet("/Download")
@@ -49,8 +49,10 @@ public class Download extends HttpServlet {
 	private static Log Log = new Log();
 
 	private static DbxRequestConfig config = new DbxRequestConfig("FreshDrive", Locale.getDefault().toString());
-	private static DbxClient client = new DbxClient(config, DropboxSettings.getInstance().getAccessToken() );
+	private static DbxClient client = new DbxClient(config, DropboxSettings.getInstance().getAccessToken());
+	
 	/**
+	 * Services POST requests sent to the /Download servlet 
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

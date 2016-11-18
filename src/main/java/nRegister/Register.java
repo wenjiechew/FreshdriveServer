@@ -19,7 +19,8 @@ import nObjectModel.Account;
 import nUtillities.Log;
 
 /**
- * Servlet implementation class Login
+ * Services all requests for a new user trying to register a new account
+ * Servlet implementation class Register
  */
 @WebServlet("/Register")
 public class Register extends HttpServlet {
@@ -36,22 +37,33 @@ public class Register extends HttpServlet {
 		response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
 
+        //Retrieve all parameters that were passed in the request
         Account account = new Account();
         account.setUsername(request.getParameter("username"));
         account.setPassword(BCrypt.hashpw(request.getParameter("password"),BCrypt.gensalt()));
         account.setEmail(request.getParameter("email"));
         
+        /*
+         * Try to create the user with given parameters 
+         * and let the user know if the registration was successful
+         */
         if(createUser(account)){
             response.setContentType("text/html");            
-            Log.log("Register Process|New account:'"+ account.getUsername() + " ' created");
+            Log.log("Register Process| New account: '"+ account.getUsername() + " ' created");
             out.println("Registered");
         }
+        //If registration failed, return error code which will be handled and properly displayed to the user at client
         else {
 			response.setContentType("text/html" );
 			out.println("1");
         }
 	}
 	
+	/**
+	 * Try to create a new user account in the database with the provided account information 
+	 * @param account	object holding all account information (username, email, password)
+	 * @return true if account created, else false
+	 */
 	public boolean createUser(Account account) {
 		try {
 			connection = DBAccess.getInstance().openDB();

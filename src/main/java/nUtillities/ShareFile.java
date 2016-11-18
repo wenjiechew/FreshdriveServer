@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -19,7 +20,9 @@ import nDatabase.DBAccess;
 import nLogin.Validate;
 
 /**
- * Servlet implementation class Login
+ * Servlet to service POST requests for file sharing operations (add or remove sharing users)
+ *  
+ * Servlet implementation class ShareFile
  */
 @WebServlet("/ShareFile")
 public class ShareFile extends HttpServlet {
@@ -41,55 +44,69 @@ public class ShareFile extends HttpServlet {
 		response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         
+        /*
+         * Verifies the requesting user first against the database records, 
+         * to check if he has provided a valid set of username of token 
+         */
         if(Validate.verifyToken(token, username)==1){
 	        String[] userArray = users.split(";");
 	        List<String> errorUserList = new ArrayList<String>();
 	        List<Integer> userIDs = new ArrayList<Integer>();
 	        List<String> userNames = new ArrayList<String>();
 	        
-	        //Sharing of file to users
+	        /*
+	         * If user trying to do an add sharing operation
+	         * Perform sharing of file to users
+	         */
 	        if (action.equals("add")){
-		        if (fileID != 0){
-		        	//Validate if file exists in database
-			        if (validateFile(fileID)){
-			        	String tempName = "";
-			        	for (int i = 0; i < userArray.length; i++){
-			        		//Validate if username or email is an registered user,
-			        		//if user is registered, add to a List, userIDs, for sharing
-			        		//else add to List, errorUserList, to be returned to user to notify that user does not exist.
-			            	String[] userValidity = validateUser(userArray[i]);
-			                if (userValidity != null) {
-			                	int currentUserID = Integer.parseInt(userValidity[0]);
-			                	if (validateUserPermission(currentUserID, fileID) == 0)
-			                	{
-				                	userIDs.add(currentUserID);
-				                	userNames.add(userValidity[1]);
-				                	tempName = userValidity[1];
-			                	}
-			                }
-			                else
-			                {
-			                	errorUserList.add(userArray[i]);
-			                }
-			            }
-			        	//Share to all users in userID List
-			        	shareFile(userIDs, fileID, userNames, errorUserList);
-			        	Log.log("ShareFile Process| "+ username + " is now sharing fileID:" + fileID + " with " + tempName);
-			        	out.print(errorUserList + ",accepted="+userNames);
+	        	if(Arrays.asList(userArray).contains(username)){
+	        		//Terminate operation: User tried to share the file to himself
+	        		out.println("selfShare-Error");
+	        	}
+	        	else{
+			        if (fileID != 0){
+			        	//Validate if file exists in database
+				        if (validateFile(fileID)){
+				        	for (int i = 0; i < userArray.length; i++){
+				        		//Validate if username or email is an registered user,
+				        		//if user is registered, add to a List, userIDs, for sharing
+				        		//else add to List, errorUserList, to be returned to user to notify that user does not exist.
+				            	String[] userValidity = validateUser(userArray[i]);
+				                if (userValidity != null) {
+				                	int currentUserID = Integer.parseInt(userValidity[0]);
+				                	if (validateUserPermission(currentUserID, fileID) == 0)
+				                	{
+					                	userIDs.add(currentUserID);
+					                	userNames.add(userValidity[1]);
+					                	Log.log("ShareFile Process| "+ username + " is now sharing fileID:" + fileID + " with " + userValidity[1]);
+				                	}
+				                }
+				                else
+				                {
+				                	errorUserList.add(userArray[i]);
+				                }
+				            }
+				        	//Share to all users in userID List
+				        	shareFile(userIDs, fileID, userNames, errorUserList);
+				        	out.print(errorUserList + ",accepted="+userNames);
+				        }
+				        else
+				        {
+				        	//For error message printing
+				        	out.print("File");
+				        }
 			        }
 			        else
 			        {
 			        	//For error message printing
 			        	out.print("File");
 			        }
-		        }
-		        else
-		        {
-		        	//For error message printing
-		        	out.print("File");
-		        }
+	        	}
 	        } 
-	        //Remove shared user's access to files
+	        /*
+	         * If users trying to do an remove sharing operation
+	         * Remove shared user's access to files
+	         */
 	        else if (action.equals("remove"))
 	        {
 	        	int removedUserID = 0;
@@ -100,13 +117,12 @@ public class ShareFile extends HttpServlet {
 		            	String[] userValidity = validateUser(users);
 			        	if (userValidity != null) {
 		                	removedUserID = Integer.parseInt(userValidity[0]);
-		                	Log.log("ShareFile Process| "+ username + " stopped sharing fileID:" + fileID + " with "+ userValidity[1]);
 		                }
 		                else
 		                {
 		                	out.print("User");
 		                }
-			        	
+			        	Log.log("ShareFile Process| "+ username + " stopped sharing fileID:" + fileID + " with "+ userValidity[1]);
 			        	out.print(removeUserPermission(removedUserID, fileID));
 			        }
 			        else
