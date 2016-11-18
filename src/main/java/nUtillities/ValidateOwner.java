@@ -15,6 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import nDatabase.DBAccess;
 
 /**
+ * This servlet does a POST request to the database to check if the a particular
+ * file is being owned(uploaded) by a the user
+ * 
  * Servlet implementation class ValidateOwner
  */
 @WebServlet("/ValidateOwner")
@@ -22,56 +25,55 @@ public class ValidateOwner extends HttpServlet {
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public ValidateOwner() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+	public ValidateOwner() {
+		super();
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
 		int fileID = Integer.parseInt(request.getParameter("fileID"));
 		int userID = Integer.parseInt(request.getParameter("userID"));
-		
+
 		response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        
-        out.print(validateOwnership(userID, fileID));
+		PrintWriter out = response.getWriter();
+
+		out.print(validateOwnership(userID, fileID));
 	}
-	
+
 	/**
-	 * Validates if user is the owner of the specific file as only owners have rights to share files
+	 * Validates if user is the owner of the specific file as only owners have
+	 * rights to share files
+	 * 
 	 * @param userID
 	 * @param fileID
 	 * @return
 	 */
-	public boolean validateOwnership(int userID, int fileID){
+	public boolean validateOwnership(int userID, int fileID) {
 		int ownerID = 0;
 
 		try {
 			connection = DBAccess.getInstance().openDB();
-			preparedStatement = connection.prepareStatement("SELECT file_ownerID FROM "
-					+ "files WHERE file_ID=?");
-				
+			preparedStatement = connection.prepareStatement("SELECT file_ownerID FROM " + "files WHERE file_ID=?");
+
 			preparedStatement.setInt(1, fileID);
 			ResultSet rs = preparedStatement.executeQuery();
-			
-			if(rs.next()){
+
+			if (rs.next()) {
 				ownerID = rs.getInt("file_ownerID");
 
-				if (ownerID == userID){
+				if (ownerID == userID) {
 					System.out.println("validateOwnership(): Owner validated.");
 					return true;
-				}
-				else
-				{
+				} else {
 					System.out.println("validateOwnership(): User is not the file owner.");
 					return false;
 				}

@@ -90,18 +90,20 @@ public class Upload extends HttpServlet {
 					//Do upload to Dropbox
 					DbxEntry.File uploadedFile = client.uploadFile( fileModel.getFilePath(),
 													DbxWriteMode.add(), Long.parseLong( fileModel.getFileLength() ), fileInputStream);
+					Log.log("Upload Process| " + request.getHeader("username") + " uploaded "+ request.getHeader("fileName")+ ", size :" + request.getHeader("fileLength")+"bytes");
 					//Update File Table in Database
 					//Check if update done isDone = true
 					if(addFileToDatabase(fileModel)){
 						
 						//Update Permission Table
 						insertPermissiontoDatabase(fileModel);
+					
 						
 					}else{
 						client.delete( AESCipher.DecryptString(fileModel.getPathByte(), fileModel.getIvByte(), fileModel.getSaltByte()));
 					}
 					out.println("File Uploaded");
-					Log.log("Upload Process| " + request.getHeader("username") + " uploaded "+ uploadedFile.toString());
+			
 				}else{
 					out.println("File already exist");
 				}
