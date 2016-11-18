@@ -63,7 +63,6 @@ public class ShareFile extends HttpServlet {
 			                	{
 				                	userIDs.add(currentUserID);
 				                	userNames.add(userValidity[1]);
-				                	Log.log("ShareFile Process| "+ username + " is now sharing fileID:" + fileID + " with " + userValidity[1]);
 			                	}
 			                }
 			                else
@@ -73,6 +72,7 @@ public class ShareFile extends HttpServlet {
 			            }
 			        	//Share to all users in userID List
 			        	shareFile(userIDs, fileID, userNames, errorUserList);
+			        	Log.log("ShareFile Process| "+ username + " is now sharing fileID:" + fileID + " with " + userNames);
 			        	out.print(errorUserList + ",accepted="+userNames);
 			        }
 			        else
@@ -98,12 +98,13 @@ public class ShareFile extends HttpServlet {
 		            	String[] userValidity = validateUser(users);
 			        	if (userValidity != null) {
 		                	removedUserID = Integer.parseInt(userValidity[0]);
+		                	Log.log("ShareFile Process| "+ username + " stopped sharing fileID:" + fileID + " with "+ userValidity[1]);
 		                }
 		                else
 		                {
 		                	out.print("User");
 		                }
-			        	Log.log("ShareFile Process| "+ username + " stopped sharing fileID:" + fileID + " with "+ userValidity[1]);
+			        	
 			        	out.print(removeUserPermission(removedUserID, fileID));
 			        }
 			        else
