@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import nDatabase.DBAccess;
+import nLogin.Validate;
 
 /**
  * This webservlet does a POST request to the database check the particular file
@@ -33,26 +34,31 @@ public class SharingList extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
-		int fileID = Integer.parseInt(request.getParameter("fileID"));
-
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
+		
+		if(Validate.verifyToken(request.getParameter("usertoken"), request.getParameter("username")) == 1){
+		
 
-		if (fileID != 0) {
-			List<Integer> sharedUsers = new ArrayList<Integer>();
-			sharedUsers = getSharingUsers(fileID);
-			List<String> sharedUsernames = new ArrayList<String>();
-			if (sharedUsers != null && sharedUsers.size() != 0) {
-				for (int i = 0; i < sharedUsers.size(); i++) {
-					sharedUsernames.add(getSharedUsernames(sharedUsers.get(i)));
+			int fileID = Integer.parseInt(request.getParameter("fileID"));		
+	
+			if (fileID != 0) {
+				List<Integer> sharedUsers = new ArrayList<Integer>();
+				sharedUsers = getSharingUsers(fileID);
+				List<String> sharedUsernames = new ArrayList<String>();
+				if (sharedUsers != null && sharedUsers.size() != 0) {
+					for (int i = 0; i < sharedUsers.size(); i++) {
+						sharedUsernames.add(getSharedUsernames(sharedUsers.get(i)));
+					}
+					out.print(sharedUsernames);
+				} else {
+					out.print("Unshared");
 				}
-				out.print(sharedUsernames);
 			} else {
-				out.print("Unshared");
+				out.print("File");
 			}
 		} else {
-			out.print("File");
+			out.println("unverified-token");
 		}
 	}
 

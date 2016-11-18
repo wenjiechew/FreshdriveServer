@@ -19,6 +19,7 @@ import com.google.gson.JsonObject;
 
 import nConstants.Constants;
 import nDatabase.DBAccess;
+import nLogin.Validate;
 
 /**
  * This servlet allows POST, 
@@ -46,36 +47,41 @@ public class Retrieve extends HttpServlet {
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
 		
-		JsonArray array = new JsonArray();
-		JsonObject obj = new JsonObject();
-		try {			
-			connection = DBAccess.getInstance().openDB();
-			
-			// Get all the file_IDs and file Names permitted to a given user ID
-			preparedStatement = connection.prepareStatement(Constants.SELECT_FileRelatedtoID);
-			preparedStatement.setString(1, request.getParameter("userID")); 
-			rset = preparedStatement.executeQuery();
-			
-			if(rset.next()){
-				do{
-					JsonObject jObj = new JsonObject();
-				    jObj.addProperty("fileId", rset.getString("file_ID") );
-				    jObj.addProperty("fileName", rset.getString("file_name") );
-				    array.add(jObj);
-				} while (rset.next());
+		if(Validate.verifyToken(request.getParameter("usertoken"), request.getParameter("username")) == 1){
+		
+			JsonArray array = new JsonArray();
+			JsonObject obj = new JsonObject();
+			try {			
+				connection = DBAccess.getInstance().openDB();
+				
+				// Get all the file_IDs and file Names permitted to a given user ID
+				preparedStatement = connection.prepareStatement(Constants.SELECT_FileRelatedtoID);
+				preparedStatement.setString(1, request.getParameter("userID")); 
+				rset = preparedStatement.executeQuery();
+				
+				if(rset.next()){
+					do{
+						JsonObject jObj = new JsonObject();
+					    jObj.addProperty("fileId", rset.getString("file_ID") );
+					    jObj.addProperty("fileName", rset.getString("file_name") );
+					    array.add(jObj);
+					} while (rset.next());
+				}
+				
+				obj.add("fileNames", array);
+				
+				rset.close();
+				preparedStatement.close();
+				connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			
-			obj.add("fileNames", array);
-			
-			rset.close();
-			preparedStatement.close();
-			connection.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
+			out.print(gson.toJson(obj));
+		}else{
+			out.println("unverified-token");
 		}
-		out.print(gson.toJson(obj));
 	}
 
 }
