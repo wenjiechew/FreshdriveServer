@@ -86,8 +86,7 @@ public class Download extends HttpServlet {
 		            byte[] data = Files.readAllBytes( Paths.get(file.getAbsolutePath()) );
 		            //send the bytes to the client
 		            out.println(Arrays.toString(data));
-		            
-		            Log.log("Download Process| "+ request.getParameter("username") + " downloaded " + downloadedFile.toString());
+		            Log.log("Download Process| "+ request.getParameter("username") + " downloaded " + fileModel.getFileName() + ", size :" +fileModel.getFileLength() + "bytes");
 				}
 				
 				rs.close();
@@ -129,6 +128,7 @@ public class Download extends HttpServlet {
 			fileModel.setPathByte( rs.getBytes("file_path") );
 			fileModel.setIvByte( rs.getBytes("file_iv") );
 			fileModel.setSaltByte( rs.getBytes("file_salt") );
+			fileModel.setFileLength(rs.getString("file_size"));
 			isDone = 1;
 		}else{
 			out.println("No Such File in Database");

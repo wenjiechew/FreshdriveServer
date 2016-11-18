@@ -52,6 +52,7 @@ public class ShareFile extends HttpServlet {
 		        if (fileID != 0){
 		        	//Validate if file exists in database
 			        if (validateFile(fileID)){
+			        	String tempName = "";
 			        	for (int i = 0; i < userArray.length; i++){
 			        		//Validate if username or email is an registered user,
 			        		//if user is registered, add to a List, userIDs, for sharing
@@ -63,6 +64,7 @@ public class ShareFile extends HttpServlet {
 			                	{
 				                	userIDs.add(currentUserID);
 				                	userNames.add(userValidity[1]);
+				                	tempName = userValidity[1];
 			                	}
 			                }
 			                else
@@ -72,7 +74,7 @@ public class ShareFile extends HttpServlet {
 			            }
 			        	//Share to all users in userID List
 			        	shareFile(userIDs, fileID, userNames, errorUserList);
-			        	Log.log("ShareFile Process| "+ username + " is now sharing fileID:" + fileID + " with " + userNames);
+			        	Log.log("ShareFile Process| "+ username + " is now sharing fileID:" + fileID + " with " + tempName);
 			        	out.print(errorUserList + ",accepted="+userNames);
 			        }
 			        else

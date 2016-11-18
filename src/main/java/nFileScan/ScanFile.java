@@ -34,8 +34,8 @@ public class ScanFile extends HttpServlet {
 		if(Validate.verifyToken(
 				request.getParameter("user_token"), request.getParameter("username")) == 1){			
 			out.println( scanSettings.getScanKey() );
-			Log.log("Scan File Process|"+ request.getParameter("username") + " submited a file to scan");
-		}else {
+		}
+		else {
 			out.println("unverified-token");
 		}
 		

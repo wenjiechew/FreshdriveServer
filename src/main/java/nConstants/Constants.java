@@ -30,7 +30,7 @@ public class Constants {
 			+ "(SELECT permission_fileID from permissions where permission_sharedToUserID = ?)";
 	
 	//File Download get fileID
-	public static String SELECT_FileID = "SELECT file_path, file_salt, file_iv, file_name FROM files WHERE file_ID = ?" ;
+	public static String SELECT_FileID = "SELECT file_path, file_salt, file_iv, file_name, file_size FROM files WHERE file_ID = ?" ;
 	
 	public static void setCurrentPath(String currentPath) {
 		Constants.currentPath = currentPath;
