@@ -152,6 +152,7 @@ public class Login extends HttpServlet {
 		executorService = Executors.newScheduledThreadPool(1);
 		executorService.schedule(() -> {
 			expireOTP(account.getUsername());
+			executorService.shutdown();
 		}, 180L, TimeUnit.SECONDS);
 	}
 
