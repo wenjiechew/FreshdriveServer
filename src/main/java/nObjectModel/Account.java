@@ -1,6 +1,12 @@
 package nObjectModel;
 
-
+/**
+ * Account object entity 
+ * Contains fields which can hold all user's information, and accessed through getters and setters.
+ * 
+ * @author ottoma
+ *
+ */
 public class Account {
 	private String _id;
 	private String username;

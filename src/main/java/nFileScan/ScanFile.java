@@ -15,8 +15,9 @@ import nUtillities.Log;
 
 /**
  * Servlet implementation class ScanFile
- * This Servlet returns upon a POST and checked if user is valid (username and Token)
- * then returns Virus Scan Key
+ * 
+ * This Servlet returns upon a POST request and checks if the requesting user is valid (username and token)
+ * before returning the Virus Scanner's API Key
  */
 @WebServlet("/ScanFile")
 public class ScanFile extends HttpServlet {
@@ -34,7 +35,7 @@ public class ScanFile extends HttpServlet {
 		if(Validate.verifyToken(
 				request.getParameter("user_token"), request.getParameter("username")) == 1){			
 			out.println( scanSettings.getScanKey() );
-			Log.log("Scan File Process|"+ request.getParameter("username") + " submited a file to scan");
+			Log.log("Scan File Process|"+ request.getParameter("username") + " submitted a file to scan");
 		}else {
 			out.println("unverified-token");
 		}

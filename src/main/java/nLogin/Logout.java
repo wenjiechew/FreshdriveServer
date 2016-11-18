@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import nUtillities.Log;
 
 /**
+ * Services log out request, clearing the user's session credentials (i.e. token and OTP)
  * Servlet implementation class Logout
  */
 @WebServlet("/Logout")

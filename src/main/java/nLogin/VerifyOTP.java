@@ -19,6 +19,7 @@ import nDatabase.DBAccess;
 import nUtillities.Log;
 
 /**
+ * To service POST requests for a provided OTP code and username
  * Servlet implementation class VerifyOTP
  */
 @WebServlet("/VerifyOTP")
@@ -28,6 +29,7 @@ public class VerifyOTP extends HttpServlet {
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
 	private static Log Log = new Log();
+	
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -50,7 +52,7 @@ public class VerifyOTP extends HttpServlet {
 				// in the format of id+username+email+token
 				String userInfo = getUserInformation(username);
 				out.println(userInfo);
-				Log.log("Login Process|"+ username + " OTP accepted");
+				Log.log("Login Process| "+ username + " OTP accepted");
 			}
         }
         else if(Validate.verifyOTP(username, otp)==-1){
@@ -61,10 +63,20 @@ public class VerifyOTP extends HttpServlet {
         }
 	}
 	
+	/**
+	 * Generate a random access token string
+	 * @return token string
+	 */
 	public String genToken() {
 		return new BigInteger(130, sr).toString(32);
 	}
 	
+	/**
+	 * Called after user has been logged in successfully
+	 * Returns all user information that the user will need to perform operations and verify his identity in the app 
+	 * @param username
+	 * @return	concat string holding user's ID, username, email and access token
+	 */
 	protected String getUserInformation(String username){
 		String info = null;
 		try{
@@ -80,8 +92,8 @@ public class VerifyOTP extends HttpServlet {
 			rs.close();
 			preparedStatement.close();
 			connection.close();
-		} catch (SQLException e) {
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return info;
 	}

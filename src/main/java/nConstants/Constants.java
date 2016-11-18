@@ -1,7 +1,7 @@
 package nConstants;
 
 /**
- * This File is a Collects all Constants Variables that is used throughout the application, to prevent REPEATATIVE CODES
+ * This File is a Collects all Constants Variables that is used throughout the application, to prevent repititive codes
  * @author WenJieChew
  *
  */
@@ -32,14 +32,17 @@ public class Constants {
 	//File Download get fileID
 	public static String SELECT_FileID = "SELECT file_path, file_salt, file_iv, file_name FROM files WHERE file_ID = ?" ;
 	
+	//Sets the current path to specify where the server is located at
 	public static void setCurrentPath(String currentPath) {
 		Constants.currentPath = currentPath;
 	}
 	
+	//Gets the config path with reference to the current path
 	public static String getConfigPath(){
 		return currentPath + configFileLocation;
 	}
 	
+	//Gets file path with reference to the current path
 	public static String getFilePathLocation(){
 		return currentPath + downloadFileLocation;
 	}

@@ -64,11 +64,17 @@ public class StartupInit implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce)  { 
     	Constants.setCurrentPath( sce.getServletContext().getRealPath("/") );
     	
+    	//Check and delete expired files at the start of each day (i.e. at 12am / 0000hrs of the day)
  		executorService.scheduleAtFixedRate(() -> {
- 			
- 			ExpiryFileRemove.deleteFileExpired();		
- 			
+ 			ExpiryFileRemove.deleteFileExpired();
  		},initialDelay , PERIOD, TimeUnit.MILLISECONDS);
+ 		
+ 		//Comment the above executorService and
+ 		//uncomment the following executorService below to check and delete expired files every 5 minutes instead
+// 		executorService.scheduleAtFixedRate(() -> {
+// 			ExpiryFileRemove.deleteFileExpired();
+// 		},0 , 60000L, TimeUnit.MILLISECONDS);
+ 		
     }
 	
 }

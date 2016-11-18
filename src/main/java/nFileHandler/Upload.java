@@ -29,10 +29,12 @@ import nUtillities.Log;
 
 
 /**
- * This Serlvet only allow POST, from the client, Which first validates the right user before executing the main task. @return unverified-token 
- * Upon token is validated. file will be checked if it's existed in the applicaiton @return file Exists
+ * This Servlet only allow POST, from the client, which first validates the right user before executing the main task. @return unverified-token 
+ * Upon token is validated. 
+ * file will be checked if it's existed in the application, returns HTTP response saying file Exists
  * else file will be uploaded into the dropbox then updates the file table in the database, following by updating the
  * permission table.
+ * 
  * Servlet implementation class Upload
  */
 @WebServlet("/Upload")
@@ -40,7 +42,7 @@ public class Upload extends HttpServlet {
 	private static Connection connection;
 	private static PreparedStatement preparedStatement;
 	private static ResultSet rs;
-	private static Log Log;
+	private static Log Log = new Log();
 	
 	private static final long serialVersionUID = 1L;	
 	
@@ -98,7 +100,6 @@ public class Upload extends HttpServlet {
 					}else{
 						client.delete( AESCipher.DecryptString(fileModel.getPathByte(), fileModel.getIvByte(), fileModel.getSaltByte()));
 					}
-					
 					out.println("File Uploaded");
 					Log.log("Upload Process| " + request.getHeader("username") + " uploaded "+ uploadedFile.toString());
 				}else{
@@ -110,11 +111,12 @@ public class Upload extends HttpServlet {
 				connection.close();	
 			} catch (SQLException e) {
 				e.printStackTrace();
+				out.println("Error");
 			} catch (Exception e) {
+				out.println("Error");
 				e.printStackTrace();
 			}			
 		}else{
-			//TODO Change Return ERROR
 			out.println("unverified-token");
 		}			
 

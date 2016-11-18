@@ -8,7 +8,7 @@ import nConstants.Constants;
 import nConstants.DBSettings;
 
 /**
- * The Class is create a Connection with the mySQL database.
+ * The Class is to create a Connection with the mySQL database.
  * @author WenJieChew
  *
  */
@@ -16,7 +16,7 @@ public class DBAccess {
 	private static DBAccess instance;
 	private DBSettings setting = DBSettings.getInstance();
 
-	
+	//Retrieves the instance of the DBAccess object
 	public static DBAccess getInstance() { 
 		if( instance == null ) { instance = new DBAccess(); }	
 		return instance;

@@ -1,7 +1,13 @@
 package nObjectModel;
 
 import java.sql.Date;
-
+/**
+ * File object entity
+ * Contains fields which can hold all file's information, and accessed through getters and setters.
+ * 
+ * @author ottoma
+ *
+ */
 public class FileModel {
 	private int fileID;
 	private String fileName = null;

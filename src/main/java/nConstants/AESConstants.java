@@ -11,11 +11,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-/**
- * This class reads From a file, and returns it appropriate values.
- * @author WenJieChew
- *
- */
 public class AESConstants {
 	private static AESConstants instance;
 	private static JSONParser parser = new JSONParser();
@@ -23,7 +18,7 @@ public class AESConstants {
 	private static String AESPass = null;
 	
 	/**
-	 * 
+	 * Get instance of the AESConstants
 	 * @return the instance of the object created
 	 */
 	public static AESConstants getInstance(){
@@ -35,7 +30,7 @@ public class AESConstants {
 	}
 
 	/**
-	 * 
+	 * Retrieves the AES password String
 	 * @return AES Password
 	 */
 	public String getAESPass() {
@@ -51,7 +46,7 @@ public class AESConstants {
 	}
 	
 	/**
-	 * Reads an JSON file from a stated location, and collects and sets the it's value appropriately.
+	 * Reads an JSON file from a stated location, then collects and sets its value appropriately.
 	 */
 	private static void readJSONFile(){
 
