@@ -20,8 +20,9 @@ import nDatabase.DBAccess;
 import nLogin.Validate;
 
 /**
- * Servlet to service POST requests for file sharing operations (add or remove sharing users)
- *  
+ * Servlet to service POST requests for file sharing operations (add or remove
+ * sharing users)
+ * 
  * Servlet implementation class ShareFile
  */
 @WebServlet("/ShareFile")
@@ -30,147 +31,144 @@ public class ShareFile extends HttpServlet {
 	private static PreparedStatement preparedStatement;
 	private static final long serialVersionUID = 1L;
 	private static Log Log = new Log();
-	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
 		int fileID = Integer.parseInt(request.getParameter("fileID"));
 		String action = request.getParameter("action");
 		String token = request.getParameter("token");
-		//User(s) that will be added/removed from sharing
+		// User(s) that will be added/removed from sharing
 		String users = request.getParameter("users");
-		//User (file owner) that is performing the action
+		// User (file owner) that is performing the action
 		String username = request.getParameter("username");
-		
+
 		response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        
-        /*
-         * Verifies the requesting user first against the database records, 
-         * to check if he has provided a valid set of username of token 
-         */
-        if(Validate.verifyToken(token, username)==1){
-	        String[] userArray = users.split(";");
-	        List<String> errorUserList = new ArrayList<String>();
-	        List<Integer> userIDs = new ArrayList<Integer>();
-	        List<String> userNames = new ArrayList<String>();
-	        
-	        /*
-	         * If user trying to do an add sharing operation
-	         * Perform sharing of file to users
-	         */
-	        if (action.equals("add")){
-	        	if(Arrays.asList(userArray).contains(username)){
-	        		//Terminate operation: User tried to share the file to himself
-	        		out.println("selfShare-Error");
-	        	}
-	        	else{
-			        if (fileID != 0){
-			        	//Validate if file exists in database
-				        if (validateFile(fileID)){
-				        	for (int i = 0; i < userArray.length; i++){
-				        		//Validate if username or email is an registered user,
-				        		//if user is registered, add to a List, userIDs, for sharing
-				        		//else add to List, errorUserList, to be returned to user to notify that user does not exist.
-				            	String[] userValidity = validateUser(userArray[i]);
-				                if (userValidity != null) {
-				                	int currentUserID = Integer.parseInt(userValidity[0]);
-				                	if (validateUserPermission(currentUserID, fileID) == 0)
-				                	{
-					                	userIDs.add(currentUserID);
-					                	userNames.add(userValidity[1]);
-					                	Log.log("ShareFile Process| "+ username + " is now sharing fileID:" + fileID + " with " + userValidity[1]);
-				                	}
-				                }
-				                else
-				                {
-				                	errorUserList.add(userArray[i]);
-				                }
-				            }
-				        	//Share to all users in userID List
-				        	shareFile(userIDs, fileID, userNames, errorUserList);
-				        	out.print(errorUserList + ",accepted="+userNames);
-				        }
-				        else
-				        {
-				        	//For error message printing
-				        	out.print("File");
-				        }
-			        }
-			        else
-			        {
-			        	//For error message printing
-			        	out.print("File");
-			        }
-	        	}
-	        } 
-	        /*
-	         * If users trying to do an remove sharing operation
-	         * Remove shared user's access to files
-	         */
-	        else if (action.equals("remove"))
-	        {
-	        	int removedUserID = 0;
-		        if (fileID != 0){
-		        	//Validate if file exists in database
-			        if (validateFile(fileID)){
-			        	//Validate if user is registered
-		            	String[] userValidity = validateUser(users);
-			        	if (userValidity != null) {
-		                	removedUserID = Integer.parseInt(userValidity[0]);
-		                }
-		                else
-		                {
-		                	out.print("User");
-		                }
+		PrintWriter out = response.getWriter();
 
-			        		Log.log("ShareFile Process| "+ username + " stopped sharing fileID:" + fileID + " with "+ userValidity[1]);
+		/*
+		 * Verifies the requesting user first against the database records, to
+		 * check if he has provided a valid set of username of token
+		 */
+		if (Validate.verifyToken(token, username) == 1) {
+			String[] userArray = users.split(";");
+			List<String> errorUserList = new ArrayList<String>();
+			List<Integer> userIDs = new ArrayList<Integer>();
+			List<String> userNames = new ArrayList<String>();
 
-			        	
-			        	out.print(removeUserPermission(removedUserID, fileID));
-			        }
-			        else
-			        {
-			        	out.print("File");
-			        }
-		        }
-		        else
-		        {
-		        	out.print("File");
-		        }
-	        }
-        }
-        else{
-        	out.print("unverified-token");
-        }
+			/*
+			 * If user trying to do an add sharing operation Perform sharing of
+			 * file to users
+			 */
+			if (action.equals("add")) {
+				if (Arrays.asList(userArray).contains(username)) {
+					// Terminate operation: User tried to share the file to
+					// himself
+					out.println("selfShare-Error");
+				} else {
+					if (fileID != 0) {
+						// Validate if file exists in database
+						if (validateFile(fileID)) {
+							for (int i = 0; i < userArray.length; i++) {
+								// Validate if username or email is an
+								// registered user,
+								// if user is registered, add to a List,
+								// userIDs, for sharing
+								// else add to List, errorUserList, to be
+								// returned to user to notify that user does not
+								// exist.
+								String[] userValidity = validateUser(userArray[i]);
+								if (userValidity != null) {
+									int currentUserID = Integer.parseInt(userValidity[0]);
+									if (validateUserPermission(currentUserID, fileID) == 0) {
+										userIDs.add(currentUserID);
+										userNames.add(userValidity[1]);
+										Log.log("ShareFile Process| " + username + " is now sharing fileID:" + fileID
+												+ " with " + userValidity[1]);
+									}
+								} else {
+									errorUserList.add(userArray[i]);
+								}
+							}
+							// Share to all users in userID List
+							shareFile(userIDs, fileID, userNames, errorUserList);
+							out.print(errorUserList + ",accepted=" + userNames);
+						} else {
+							// For error message printing
+							out.print("File");
+						}
+					} else {
+						// For error message printing
+						out.print("File");
+					}
+				}
+			}
+			/*
+			 * If users trying to do an remove sharing operation Remove shared
+			 * user's access to files
+			 */
+			else if (action.equals("remove")) {
+				int removedUserID = 0;
+				String removedUserName = null;
+				if (fileID != 0) {
+					// Validate if file exists in database
+					if (validateFile(fileID)) {
+						// Validate if user is registered
+						String[] userValidity = validateUser(users);
+						if (userValidity != null) {
+							removedUserID = Integer.parseInt(userValidity[0]);
+							removedUserName = userValidity[1];
+						} else {
+							out.print("User");
+						}
+
+						Log.log("ShareFile Process| " + username + " stopped sharing fileID:" + fileID + " with "
+								+ removedUserName);
+
+						out.print(removeUserPermission(removedUserID, fileID));
+					} else {
+						out.print("File");
+					}
+				} else {
+					out.print("File");
+				}
+			}
+		} else {
+			out.print("unverified-token");
+		}
 	}
-	
+
 	/**
 	 * Updates database to grant permission to specified users for a file
-	 * @param users	list of user(s) ID to whom the file will be shared 
-	 * @param fileID	id of the file that will be shared
-	 * @param userNames	list of username corresponding to users
-	 * @param errorUserList	list of users that are not weren't managed to be shared with (i.e. errored)
-	 * @return 1 if at least partially successful, else 0. 
+	 * 
+	 * @param users
+	 *            list of user(s) ID to whom the file will be shared
+	 * @param fileID
+	 *            id of the file that will be shared
+	 * @param userNames
+	 *            list of username corresponding to users
+	 * @param errorUserList
+	 *            list of users that are not weren't managed to be shared with
+	 *            (i.e. errored)
+	 * @return 1 if at least partially successful, else 0.
 	 */
-	public static int shareFile(List<Integer> users, int fileID, List<String> userNames, List<String> errorUserList){
+	public static int shareFile(List<Integer> users, int fileID, List<String> userNames, List<String> errorUserList) {
 		try {
 			connection = DBAccess.getInstance().openDB();
-			for (int i = 0; i < users.size(); i++){
-				preparedStatement = connection.prepareStatement("INSERT INTO permissions (permission_fileID, permission_sharedToUserID) "
-						+ "VALUES (?,?)");
-				
+			for (int i = 0; i < users.size(); i++) {
+				preparedStatement = connection.prepareStatement(
+						"INSERT INTO permissions (permission_fileID, permission_sharedToUserID) " + "VALUES (?,?)");
+
 				preparedStatement.setInt(1, fileID);
 				preparedStatement.setInt(2, users.get(i));
 				int rs = preparedStatement.executeUpdate();
-				
-				if (rs == 1){
-					//Working well; do nothing and continue with execution
-				}
-				else
-				{
+
+				if (rs == 1) {
+					// Working well; do nothing and continue with execution
+				} else {
 					errorUserList.add(userNames.get(i));
 				}
-			}		
+			}
 			preparedStatement.close();
 			connection.close();
 			return 1;
@@ -179,127 +177,125 @@ public class ShareFile extends HttpServlet {
 		}
 		return 0;
 	}
-	
+
 	/**
 	 * Validates if specified user is an registered user
+	 * 
 	 * @param user
 	 * @return an array [userID, username] if validated else null
 	 */
-	public static String[] validateUser(String user){
+	public static String[] validateUser(String user) {
 		String[] userInfo = new String[2];
-		
+
 		try {
 			connection = DBAccess.getInstance().openDB();
-			preparedStatement = connection.prepareStatement("SELECT * FROM "
-					+ "users WHERE user_email=? OR username=?");
-			
+			preparedStatement = connection
+					.prepareStatement("SELECT * FROM " + "users WHERE user_email=? OR username=?");
+
 			preparedStatement.setString(1, user);
 			preparedStatement.setString(2, user);
 			ResultSet rs = preparedStatement.executeQuery();
-			
-			if(rs.next()){
+
+			if (rs.next()) {
 				userInfo[0] = rs.getString("user_ID");
 				userInfo[1] = rs.getString("username");
-			}
-			else
-			{
+			} else {
 				userInfo = null;
 			}
-			
+
 			rs.close();
 			preparedStatement.close();
 			connection.close();
-			
+
 		} catch (Exception e) {
 		}
 		return userInfo;
 	}
-	
+
 	/**
 	 * Validates if selected file exists in database
+	 * 
 	 * @param fileID
 	 * @return true (exists) or false (doesn't exist)
 	 */
-	public static boolean validateFile(int fileID){
+	public static boolean validateFile(int fileID) {
 		boolean valid = false;
-		
+
 		try {
 			connection = DBAccess.getInstance().openDB();
-			preparedStatement = connection.prepareStatement("SELECT * FROM "
-					+ "files WHERE file_ID=?");
-			
+			preparedStatement = connection.prepareStatement("SELECT * FROM " + "files WHERE file_ID=?");
+
 			preparedStatement.setInt(1, fileID);
 			ResultSet rs = preparedStatement.executeQuery();
-			
-			if(rs.next()){
+
+			if (rs.next()) {
 				valid = true;
-			}
-			else
-			{
+			} else {
 				valid = false;
 			}
-			
+
 			rs.close();
 			preparedStatement.close();
 			connection.close();
-			
+
 		} catch (Exception e) {
 		}
 		return valid;
 	}
-	
+
 	/**
 	 * Validates if specific user has access to the specific file already.
+	 * 
 	 * @param userID
 	 * @param fileID
 	 * @return 1 (already has access) or 0 (no access)
 	 */
-	public static int validateUserPermission(int userID, int fileID){
+	public static int validateUserPermission(int userID, int fileID) {
 		try {
 			connection = DBAccess.getInstance().openDB();
-			preparedStatement = connection.prepareStatement("SELECT * FROM "
-					+ "permissions WHERE permission_fileID=? AND permission_sharedToUserID=?");
-			
+			preparedStatement = connection.prepareStatement(
+					"SELECT * FROM " + "permissions WHERE permission_fileID=? AND permission_sharedToUserID=?");
+
 			preparedStatement.setInt(1, fileID);
 			preparedStatement.setInt(2, userID);
 			ResultSet rs = preparedStatement.executeQuery();
-			
-			if(rs.next()){
+
+			if (rs.next()) {
 				return 1;
 			}
-			
+
 			rs.close();
 			preparedStatement.close();
 			connection.close();
-			
+
 		} catch (Exception e) {
-			
+
 		}
 		return 0;
 	}
 
 	/**
 	 * Update database to remove the access of a file to a specific user
+	 * 
 	 * @param userID
 	 * @param fileID
 	 * @return 1 (removed) or 0 (permission not found)
 	 */
-	public static int removeUserPermission(int userID, int fileID){
+	public static int removeUserPermission(int userID, int fileID) {
 		try {
 			connection = DBAccess.getInstance().openDB();
-			preparedStatement = connection.prepareStatement("DELETE FROM "
-					+ "permissions WHERE permission_fileID=? AND permission_sharedToUserID=?");
-			
+			preparedStatement = connection.prepareStatement(
+					"DELETE FROM " + "permissions WHERE permission_fileID=? AND permission_sharedToUserID=?");
+
 			preparedStatement.setInt(1, fileID);
 			preparedStatement.setInt(2, userID);
 			int rs = preparedStatement.executeUpdate();
-			
-			if(rs == 1){
+
+			if (rs == 1) {
 				return 1;
+			} else {
 			}
-			else {
-			}
-			
+
 			preparedStatement.close();
 			connection.close();
 		} catch (Exception e) {
