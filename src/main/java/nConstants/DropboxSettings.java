@@ -16,56 +16,70 @@ import org.json.simple.parser.JSONParser;
  */
 public class DropboxSettings {
 	private static DropboxSettings instance;
-	
+
 	private static JSONParser parser = new JSONParser();
 	private static String AccessToken = null;
-	
+
 	/**
 	 * 
 	 * @return the instance of the object created
 	 */
-	public static DropboxSettings getInstance(){
-		if( instance == null ) {
-			
+	public static DropboxSettings getInstance() {
+		if (instance == null) {
+
 			instance = new DropboxSettings();
-			readJSONFile();			
-		}	
+			readJSONFile();
+		}
 		return instance;
 	}
-	
+
 	/**
 	 * @return the AccessToken of the Database
 	 */
-	
+
 	public String getAccessToken() {
-		return AccessToken;
+		return new String(AccessToken);
+	}
+
+	/**
+	 * Clears the instance when the access token has be retrieved,to clear the
+	 * access token away from the memory
+	 */
+	public static void clearInstance() {
+
+		if (instance != null) {
+
+			instance = null;
+
+		}
+
 	}
 
 	/**
 	 * Sets the local variable AccessToken
+	 * 
 	 * @param accessToken
 	 */
 	private static void setAccessToken(String accessToken) {
 		AccessToken = accessToken;
-	}	
-	
+	}
+
 	/**
-	 * Reads an JSON file from a stated location, and collects and sets the it's value appropriately.
+	 * Reads an JSON file from a stated location, and collects and sets the it's
+	 * value appropriately.
 	 */
-	private static void readJSONFile(){
+	private static void readJSONFile() {
 
-        try { 
-            Object obj = parser.parse(new FileReader(
-                   Constants.getConfigPath() ));
- 
-            JSONObject jsonObject = (JSONObject) obj;
- 
-            setAccessToken(  (String) jsonObject.get("DropBoxAccessToken") );
+		try {
+			Object obj = parser.parse(new FileReader(Constants.getConfigPath()));
 
-             
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+			JSONObject jsonObject = (JSONObject) obj;
+
+			setAccessToken((String) jsonObject.get("DropBoxAccessToken"));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

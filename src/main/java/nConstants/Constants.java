@@ -39,12 +39,12 @@ public class Constants {
 	
 	//Gets the config path with reference to the current path
 	public static String getConfigPath(){
-		return currentPath + configFileLocation;
+		return new String(currentPath + configFileLocation);
 	}
 	
 	//Gets file path with reference to the current path
 	public static String getFilePathLocation(){
-		return currentPath + downloadFileLocation;
+		return new String(currentPath + downloadFileLocation);
 	}
 
 	

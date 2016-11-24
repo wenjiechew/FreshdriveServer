@@ -40,7 +40,7 @@ public class Validate {
 				String hashed = rs.getString("user_password");
 				// Compare and validate given password input
 				if (BCrypt.checkpw(password, hashed))
-					return valid = true;
+					valid= true;
 			}
 			DBAccess.getInstance().closeDB();
 			

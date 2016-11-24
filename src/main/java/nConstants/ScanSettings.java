@@ -32,7 +32,7 @@ public class ScanSettings {
 	 * @return the VirusScan Key
 	 */
 	public String getScanKey() {
-		return ScanKey;
+		return new String(ScanKey);
 	}
 
 	/**

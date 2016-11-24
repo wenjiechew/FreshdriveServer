@@ -35,7 +35,7 @@ public class DBSettings {
 	 * @return Datebase URL
 	 */
 	public String getDB_URL() {
-		return DB_URL;
+		return new String(DB_URL);
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class DBSettings {
 	 * @return the User name
 	 */
 	public String getDB_USER() {
-		return DB_USER;
+		return new String(DB_USER);
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class DBSettings {
 	 * @return the password
 	 */
 	public String getDB_PASS() {
-		return DB_PASS;
+		return new String(DB_PASS);
 	}
 
 	/**

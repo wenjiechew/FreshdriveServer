@@ -15,15 +15,15 @@ public class Account {
 	private String token;
 
 	public String get_id() {
-		return _id;
+		return new String(_id);
 	}
 
 	public String getUsername() {
-		return username;
+		return new String(username);
 	}
 
 	public String getPassword() {
-		return password;
+		return new String(password);
 	}
 
 	
@@ -40,7 +40,7 @@ public class Account {
 	}
 
 	public String getEmail() {
-		return email;
+		return new String(email);
 	}
 
 	public void setEmail(String email) {
@@ -48,7 +48,7 @@ public class Account {
 	}
 
 	public String getToken() {
-		return token;
+		return new String(token);
 	}
 
 	public void setToken(String token) {

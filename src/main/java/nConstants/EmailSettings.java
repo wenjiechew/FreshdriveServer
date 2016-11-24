@@ -34,7 +34,7 @@ public class EmailSettings {
 	 * @return the Application's Email Configuration Password
 	 */
 	public String getEmailPass() {
-		return EmailPass;
+		return new String(EmailPass);
 	}
 	
 	/**
@@ -50,7 +50,7 @@ public class EmailSettings {
 	 * @return the Application's Email Configuration email address
 	 */
 	public String getEmailAddress() {
-		return EmailAddress;
+		return new String(EmailAddress);
 	}
 	
 	/**

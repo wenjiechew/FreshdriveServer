@@ -11,7 +11,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-public class AESConstants {
+public class AESConstants implements Cloneable {
 	private static AESConstants instance;
 	private static JSONParser parser = new JSONParser();
 	
@@ -34,7 +34,7 @@ public class AESConstants {
 	 * @return AES Password
 	 */
 	public String getAESPass() {
-		return AESPass;
+		return new String(AESPass);
 	}
 
 	/**
