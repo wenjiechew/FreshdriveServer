@@ -122,7 +122,10 @@ public class ShareFile extends HttpServlet {
 		                {
 		                	out.print("User");
 		                }
-			        	Log.log("ShareFile Process| "+ username + " stopped sharing fileID:" + fileID + " with "+ userValidity[1]);
+
+			        		Log.log("ShareFile Process| "+ username + " stopped sharing fileID:" + fileID + " with "+ userValidity[1]);
+
+			        	
 			        	out.print(removeUserPermission(removedUserID, fileID));
 			        }
 			        else

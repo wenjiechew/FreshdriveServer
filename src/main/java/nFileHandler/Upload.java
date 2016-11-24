@@ -74,7 +74,7 @@ public class Upload extends HttpServlet {
 			fileModel.setCreatedOn( request.getHeader("createdOn") );
 			fileModel.setOwnderID( request.getHeader("ownerID") );
 			fileModel.setFileLength( request.getHeader("fileLength"));
-			if (request.getHeader("expiryDate") != "" ){
+			if (!request.getHeader("expiryDate").equals("")){
 				fileModel.setExpiredDate( Date.valueOf( request.getHeader("expiryDate") ) );
 			}
 			
