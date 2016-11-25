@@ -88,7 +88,7 @@ public class Upload extends HttpServlet {
 					ServletInputStream fileInputStream = request.getInputStream();
 					
 					//Do upload to Dropbox
-					DbxEntry.File uploadedFile = client.uploadFile( fileModel.getFilePath(),
+					client.uploadFile( fileModel.getFilePath(),
 													DbxWriteMode.add(), Long.parseLong( fileModel.getFileLength() ), fileInputStream);
 					Log.log("Upload Process| " + request.getHeader("username") + " uploaded "+ request.getHeader("fileName")+ ", size :" + request.getHeader("fileLength")+"bytes");
 					//Update File Table in Database

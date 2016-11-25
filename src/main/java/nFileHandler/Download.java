@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.dropbox.core.DbxClient;
-import com.dropbox.core.DbxEntry;
+
 import com.dropbox.core.DbxRequestConfig;
 
 import nConstants.Constants;
@@ -94,7 +94,7 @@ public class Download extends HttpServlet {
 									Constants.getFilePathLocation() + fileModel.getFileName());
 
 							// Download physical File from File Server (Dropbox)
-							DbxEntry.File downloadedFile = client.getFile(fileModel.getFilePath(), null, outputStream);
+							client.getFile(fileModel.getFilePath(), null, outputStream);
 							outputStream.close();
 
 							// Get File from the temporary location
