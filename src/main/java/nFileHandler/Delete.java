@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import nLogin.Validate;
+import nUtillities.Log;
 import nUtillities.ShareFile;
 
 /**
@@ -17,6 +18,7 @@ import nUtillities.ShareFile;
 @WebServlet("/Delete")
 public class Delete extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static Log Log = new Log();
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
@@ -36,6 +38,8 @@ public class Delete extends HttpServlet {
 						
 						//Delete the specific file from the database
 						if(RemoveFiles.deleteFileIDfromTable(fileID) == 1){
+							
+							Log.log("Download Process| " + request.getParameter("username") + " has deleted a file" );
 							out.print("Successful");
 						} else {
 							out.print("Invalid-FileDelete");
