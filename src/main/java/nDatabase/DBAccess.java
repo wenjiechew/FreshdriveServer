@@ -36,7 +36,7 @@ public class DBAccess {
 	 */
 	public Connection openDB() throws SQLException, Exception{		
 		//Register JDBC
-		Class.forName( Constants.JDBC_DRIVER );
+		Class.forName( Constants.JDBC_DRIVER ).newInstance();
 		
 		//Opening Connection		
 		connection = DriverManager.getConnection( setting.getDB_URL() , setting.getDB_USER(), setting.getDB_PASS());

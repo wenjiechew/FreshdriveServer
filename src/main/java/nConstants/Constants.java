@@ -11,7 +11,7 @@ public class Constants {
 	static String downloadFileLocation = "/Temp-Files/";
 	
 	// JDBC driver name and database URL
-	public static String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+	public static String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 		
 	/*********************** File Table ***********************/
 	public static String DELETE_FileIDs = "DELETE FROM files WHERE file_ID IN ( SELECT * FROM ( SELECT file_ID FROM files WHERE file_expireOn < current_date() ) AS f );";

@@ -1,5 +1,5 @@
 {
-	"DB_URL": "jdbc:mysql://localhost:3306/freshdrivedb",
+	"DB_URL": "jdbc:mysql://localhost:3306/freshdrivedb?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Singapore",
 	"DB_USER": "root",
 	"DB_PASS": "",
 	

@@ -144,7 +144,6 @@ public class Login extends HttpServlet {
 			mailServerProperties.put("mail.smtp.starttls.enable", "true");
 			
 			//Mail Server Properties have been setup successfully
-	
 			// Step2 Generate OTP for user
 			int OTP = randomSixDigitCode(account.getUsername());
 			if (OTP == 0) {
@@ -161,7 +160,6 @@ public class Login extends HttpServlet {
 					+ "</b><br><br> Regards, <br>Freshdrive Admin<br><br> <br><br> <i>Please reply to this email if this log in was not authorised by you</i>";
 			generateMailMessage.setContent(emailBody, "text/html");
 			//Mail session has been created successfully
-	
 			// Step3 Get Session and Send mail
 			Transport transport = getMailSession.getTransport("smtp");
 	

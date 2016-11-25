@@ -45,7 +45,9 @@ public class Validate {
 			DBAccess.getInstance().closeDB();
 			
 		} catch (SQLException e) {
+			e.printStackTrace();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return valid;
@@ -99,7 +101,9 @@ public class Validate {
 			preparedStatement.close();
 			connection.close();
 		} catch (SQLException e) {
+			e.printStackTrace();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return rs;
 	}
