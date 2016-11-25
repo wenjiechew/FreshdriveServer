@@ -31,6 +31,8 @@ public class Constants {
 	
 	//File Download get fileID
 	public static String SELECT_FileID = "SELECT file_path, file_salt, file_iv, file_name, file_size FROM files WHERE file_ID = ?" ;
+	public static String DELECT_FileID = "DELETE FROM files WHERE file_ID = ? ";
+	public static String SELECT_CheckValid = "SELECT Count(file_id) FROM files WHERE file_ownerID = ? AND file_ID = ?";
 	
 	//Sets the current path to specify where the server is located at
 	public static void setCurrentPath(String currentPath) {

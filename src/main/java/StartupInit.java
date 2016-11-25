@@ -11,7 +11,7 @@ import javax.servlet.annotation.WebListener;
 
 import nConstants.Constants;
 import nDatabase.DBAccess;
-import nFileHandler.ExpiryFileRemove;
+import nFileHandler.RemoveFiles;
 
 /**
  * This Class purpose to create a schedule on Server Application Startup
@@ -66,13 +66,13 @@ public class StartupInit implements ServletContextListener {
     	
     	//Check and delete expired files at the start of each day (i.e. at 12am / 0000hrs of the day)
  		executorService.scheduleAtFixedRate(() -> {
- 			ExpiryFileRemove.deleteFileExpired();
+ 			RemoveFiles.deleteFileExpired();
  		},initialDelay , PERIOD, TimeUnit.MILLISECONDS);
  		
  		//Comment the above executorService and
  		//uncomment the following executorService below to check and delete expired files every 5 minutes instead
 // 		executorService.scheduleAtFixedRate(() -> {
-// 			ExpiryFileRemove.deleteFileExpired();
+// 			RemoveFiles.deleteFileExpired();
 // 		},0 , 60000L, TimeUnit.MILLISECONDS);
  		
     }

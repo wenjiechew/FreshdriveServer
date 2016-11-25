@@ -25,7 +25,7 @@ import nUtillities.Log;
  * @author WenJieChew
  *
  */
-public class ExpiryFileRemove {		
+public class RemoveFiles {		
 	private static Connection connection;
 	private static PreparedStatement findFileStatement;
 	private static Log Log = new Log();
@@ -99,6 +99,50 @@ public class ExpiryFileRemove {
 	}
 	
 
+	public static int deleteFileIDfromTable(int fileID) throws Exception {
+		int rowDel = 0;
+		connection = DBAccess.getInstance().openDB();		
+		
+		//Get Path of the fileID
+		findFileStatement = connection.prepareStatement(Constants.SELECT_FileID);
+		findFileStatement.setInt(1, fileID );
+		ResultSet rs = findFileStatement.executeQuery();
+		if (rs.next()){
+			//Delete from Dropbox first
+			client.delete( AESCipher.DecryptString( rs.getBytes("file_path") , rs.getBytes("file_iv") , rs.getBytes("file_salt") ));
+			
+			findFileStatement = connection.prepareStatement( Constants.DELECT_FileID );
+			findFileStatement.setInt(1, fileID);
+			rowDel = findFileStatement.executeUpdate();
+		}
+		rs.close();
+		findFileStatement.close();
+		connection.close();
+		return rowDel;		
+	}
+	
+	/**
+	 * This Function check if stated 'fileID' owned by the owner_id is already in the database
+	 * @param fileName
+	 * @param owner_id
+	 * @return Boolean True / False (Count >= 1 is False || Count == 0 is True )
+	 * @throws SQLException
+	 */
+	public static boolean validateFilePermission (int userID, int fileID) throws Exception{
+		int count = 0;
+		connection = DBAccess.getInstance().openDB();	
+		findFileStatement = connection.prepareStatement(Constants.SELECT_CheckValid);
+		findFileStatement.setInt(1, userID);
+		findFileStatement.setInt(2, fileID);
+		ResultSet rs = findFileStatement.executeQuery();
+		if(rs.next()){
+			count = rs.getInt(1);
+		}
+		rs.close();
+		return (count == 1);
+		
+	}
+	
 	
 	
 	
